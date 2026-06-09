@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TracePilot | Telemetry-Driven Routing</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Elegant serif for headings (Lora), clean sans for body (Inter) -->
+    <!-- Anthropic aesthetic font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Chart.js for the visual graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="modal hidden">
+        <div class="modal-content glass">
+            <span class="close-btn" id="close-modal">&times;</span>
+            <h2>Ingest Document</h2>
+            <p class="modal-subtitle">Inject knowledge directly into the agent's memory.</p>
+            <div class="form-group">
+                <label>Document Title</label>
+                <input type="text" id="upload-title" placeholder="e.g. Employee Handbook v3">
+            </div>
+            <div class="form-group">
+                <label>Document Content</label>
+                <textarea id="upload-content" rows="6" placeholder="Paste document text here..."></textarea>
+            </div>
+            <button id="btn-submit-upload" class="btn primary">Ingest & Extract Keywords</button>
+            <div id="upload-status" class="status-msg hidden"></div>
+        </div>
+    </div>
+
+    <!-- Admin Knowledge Base Modal -->
+    <div id="admin-modal" class="modal hidden">
+        <div class="modal-content glass" style="max-width: 800px;">
+            <span class="close-btn" id="close-admin-modal">&times;</span>
+            <h2>Knowledge Sources Portal</h2>
+            <p class="modal-subtitle">Verified external data ingested by the system.</p>
+            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                <table id="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Document Title</th>
+                            <th>Keywords Extracted</th>
+                            <th>Content Preview</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <span class="logo-icon">▲</span>
+                <h1>TracePilot</h1>
+            </div>
+            <div class="demo-controls">
+                <button id="btn-admin" class="btn outline">View Knowledge Base</button>
+                <button id="btn-upload" class="btn magic highlight">Upload Document</button>
+                <button id="btn-reset-system" class="btn outline" style="border:none; padding: 0.5rem; border-radius: 50%; font-size: 1.2rem; cursor: pointer; margin-left: 0.5rem;" title="Reset System">🔄</button>
+                <button id="btn-theme-toggle" class="btn outline" style="border-radius: 50%; width: 40px; height: 40px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: none; font-size: 1.2rem; cursor: pointer; margin-left: 0.5rem;" title="Toggle Dark Theme">🌙</button>
+            </div>
+        </header>
+
+        <main class="dashboard">
+            <!-- Left Pane: Chat Execution -->
+            <section class="pane chat-pane">
+                <div class="pane-header">
+                    <h2>Agent Execution</h2>
+                </div>
+                
+                <div id="chat-window" class="chat-window">
+                    <div class="message system">
+                        Welcome to TracePilot. Click a demo button above to begin.
+                    </div>
+                </div>
+
+                <div class="input-area" style="position: relative; display: flex; flex-direction: column;">
+                    <div style="position: relative; width: 100%;">
+                        <input type="text" id="query-input" placeholder="Enter a custom query..." style="width: 100%; padding: 0.85rem 5.5rem 0.85rem 1.25rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); font-size: 1rem;">
+                        <button id="btn-send" class="btn primary" style="position: absolute; right: 0.35rem; bottom: 0.35rem; padding: 0.5rem 1.25rem; border-radius: 6px; height: calc(100% - 0.7rem); display: flex; align-items: center; justify-content: center;">Send</button>
+                    </div>
+                    <div class="prompt-chips" style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+                        <button class="chip" data-query="Find employee handbook section 7.3" style="background: transparent; border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.8rem; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; transition: background 0.2s;">
+                            🔍 Find employee handbook section 7.3
+                        </button>
+                        <button class="chip" data-query="Find employee handbook section 8.1" style="background: transparent; border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.8rem; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; transition: background 0.2s;">
+                            🔍 Find employee handbook section 8.1
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Pane: Observability -->
+            <section class="pane observability-pane">
+                <div class="pane-header">
+                    <h2>Economic Memory</h2>
+                    <button id="btn-run-auditor" class="btn magic highlight" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Run Phoenix Auditor</button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="memory-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Tool</th>
+                                <th>Runs</th>
+                                <th>Success</th>
+                                <th>Confidence</th>
+                                <th>Delta</th>
+                            </tr>
+                        </thead>
+                        <tbody id="memory-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Delta Metrics Cards -->
+                <div class="delta-cards">
+                    <div class="card">
+                        <div class="card-title">Latest Latency</div>
+                        <div class="card-value" id="val-latency">--</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Latest Cost</div>
+                        <div class="card-value" id="val-cost">--</div>
+                    </div>
+                </div>
+
+                <!-- Decision Explanation Card -->
+                <div id="decision-panel" class="card hidden" style="margin-bottom: 1.5rem; border-left: 4px solid var(--google-blue);">
+                    <div class="card-title" style="color: var(--google-blue);">🧠 Decision Explanation</div>
+                    <div id="decision-content" style="font-size: 0.95rem; margin-top: 0.8rem; color: var(--text-primary); line-height: 1.6;">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Live Graph -->
+                <div class="graph-section">
+                    <canvas id="metricsChart"></canvas>
+                </div>
+
+                <!-- Active Learning Timeline -->
+                <div class="timeline-section">
+                    <h3>Active Learning Timeline</h3>
+                    <div id="timeline-container" class="timeline-container">
+                        <!-- Populated by JS -->
+                        <div class="timeline-empty">Awaiting events...</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="/static/app.js"></script>
+</body>
+</html>

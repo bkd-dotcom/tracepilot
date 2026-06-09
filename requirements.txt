@@ -1,0 +1,16 @@
+# Core
+google-adk>=1.0.0
+google-genai>=1.0.0
+
+# Observability (Arize track requirement)
+arize-phoenix>=8.0.0
+arize-phoenix-otel>=0.10.0
+openinference-instrumentation-google-adk>=0.1.0
+
+# Display
+rich>=13.0.0
+
+# CLI
+click>=8.0.0
+fastapi
+uvicorn

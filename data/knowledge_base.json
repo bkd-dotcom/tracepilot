@@ -1,0 +1,119 @@
+{
+  "entries": [
+    {
+      "id": "hb_7_1",
+      "title": "Employee Handbook 7.1: Workplace Conduct",
+      "keywords": ["conduct", "behavior", "handbook section 7.1", "harassment", "respect", "workplace"],
+      "content": "All employees are expected to treat colleagues with respect and professionalism. We maintain a zero-tolerance policy for harassment, discrimination, or bullying of any kind."
+    },
+    {
+      "id": "hb_7_2",
+      "title": "Employee Handbook 7.2: Dress Code",
+      "keywords": ["dress code", "attire", "clothing", "handbook section 7.2", "casual", "business"],
+      "content": "Our office has a 'dress for your day' policy. Business casual is the default, but casual attire is acceptable unless meeting with clients or external partners."
+    },
+
+    {
+      "id": "hb_7_4",
+      "title": "Employee Handbook 7.4: Equipment Usage",
+      "keywords": ["equipment", "laptop", "devices", "handbook section 7.4", "it policy", "hardware"],
+      "content": "Company-provided equipment is for business use only. Employees are responsible for securing their devices and immediately reporting any loss or theft to IT Support."
+    },
+    {
+      "id": "hb_7_5",
+      "title": "Employee Handbook 7.5: Workplace Safety",
+      "keywords": ["safety", "hazards", "emergency", "handbook section 7.5", "health", "injury"],
+      "content": "Report any safety hazards or workplace injuries to Facilities immediately. In an emergency, follow the posted evacuation routes and gather at the designated assembly point."
+    },
+    {
+      "id": "hb_8_1",
+      "title": "Employee Handbook 8.1: Compensation",
+      "keywords": ["compensation", "salary", "pay", "handbook section 8.1", "payroll", "direct deposit"],
+      "content": "Employees are paid semi-monthly on the 15th and last day of the month via direct deposit. Salary reviews occur annually in Q1."
+    },
+    {
+      "id": "hb_8_2",
+      "title": "Employee Handbook 8.2: Benefits Overview",
+      "keywords": ["benefits", "health insurance", "dental", "vision", "handbook section 8.2"],
+      "content": "Full-time employees are eligible for comprehensive health, dental, and vision insurance starting on their first day of employment."
+    },
+    {
+      "id": "hb_8_3",
+      "title": "Employee Handbook 8.3: Paid Time Off (PTO)",
+      "keywords": ["pto", "vacation", "sick leave", "time off", "handbook section 8.3", "holidays"],
+      "content": "We offer flexible PTO for salaried employees. Hourly employees accrue 15 days of PTO annually. Sick leave is separate and provides up to 10 days per year."
+    },
+    {
+      "id": "hb_8_4",
+      "title": "Employee Handbook 8.4: Retirement Plans",
+      "keywords": ["retirement", "401k", "matching", "handbook section 8.4", "pension"],
+      "content": "The company offers a 401(k) plan with a 100% match on the first 4% of employee contributions. Vesting is immediate."
+    },
+    {
+      "id": "hb_8_5",
+      "title": "Employee Handbook 8.5: Stock Options",
+      "keywords": ["stock options", "equity", "vesting", "handbook section 8.5", "shares"],
+      "content": "Eligible employees receive stock options subject to a 4-year vesting schedule with a 1-year cliff."
+    },
+    {
+      "id": "hr_onboarding",
+      "title": "HR Procedure: Employee Onboarding",
+      "keywords": ["onboarding", "new hire", "orientation", "hr procedure", "first day"],
+      "content": "New hires should attend orientation on their first Monday at 9 AM. Managers must submit IT provisioning requests at least 5 business days prior to the start date."
+    },
+    {
+      "id": "hr_offboarding",
+      "title": "HR Procedure: Employee Offboarding",
+      "keywords": ["offboarding", "resignation", "termination", "hr procedure", "exit interview"],
+      "content": "Managers must notify HR immediately upon receiving an employee's resignation. IT will revoke access at 5 PM on the final day, and equipment must be returned to Facilities."
+    },
+    {
+      "id": "hr_perf_review",
+      "title": "HR Policy: Performance Reviews",
+      "keywords": ["performance review", "evaluation", "feedback", "hr policy", "appraisal"],
+      "content": "Performance reviews are conducted bi-annually in Q1 and Q3. Managers and employees should set OKRs together at the start of each half."
+    },
+    {
+      "id": "proc_expense",
+      "title": "Internal Procedure: Expense Reports",
+      "keywords": ["expense report", "reimbursement", "receipts", "travel", "internal procedure"],
+      "content": "Submit expense reports via Expensify by the 5th of the following month. Receipts are required for all transactions over $25."
+    },
+    {
+      "id": "proc_it_ticket",
+      "title": "Internal Procedure: IT Support Tickets",
+      "keywords": ["it ticket", "helpdesk", "tech support", "computer issue", "internal procedure"],
+      "content": "For IT issues, submit a ticket via Jira Service Desk. Urgent issues affecting productivity can be escalated to the #it-help Slack channel."
+    },
+    {
+      "id": "proc_conf_room",
+      "title": "Internal Procedure: Conference Room Booking",
+      "keywords": ["conference room", "meeting room", "booking", "schedule", "internal procedure"],
+      "content": "Book conference rooms through Google Calendar. Rooms left unoccupied 15 minutes after the start time will be released automatically."
+    },
+    {
+      "id": "proc_vpn",
+      "title": "Internal Procedure: VPN Setup",
+      "keywords": ["vpn", "remote access", "network", "cisco", "internal procedure", "setup"],
+      "content": "To access internal resources remotely, use the Cisco AnyConnect client. Instructions for installing the profile and MFA setup are on the IT Wiki."
+    },
+    {
+      "id": "proc_badge",
+      "title": "Internal Procedure: Badge Access",
+      "keywords": ["badge", "security", "building access", "lost badge", "internal procedure"],
+      "content": "Wear your ID badge visibly at all times in the office. If you lose your badge, report it to Security immediately to have it deactivated and replaced."
+    },
+    {
+      "id": "info_org_chart",
+      "title": "Company Information: Org Chart",
+      "keywords": ["org chart", "leadership", "teams", "structure", "company info", "who is who"],
+      "content": "The current organizational chart, including executive leadership and department heads, can be viewed dynamically in Workday under the 'Company Directory' tab."
+    },
+    {
+      "id": "hr_complaint",
+      "title": "HR Policy: Complaint Procedure",
+      "keywords": ["complaint", "grievance", "hr policy", "report", "whistleblower"],
+      "content": "Employees may file a formal complaint with their HR Business Partner or use the anonymous Ethics Hotline available 24/7 on the intranet portal."
+    }
+  ]
+}
