@@ -6,16 +6,15 @@ from tracepilot.config import PHOENIX_ENDPOINT, PROJECT_NAME
 
 def init_tracing():
     """Initialize Phoenix tracing. Must be called BEFORE any agent code."""
-    # Set environment variable for Phoenix endpoint
-    os.environ.setdefault("PHOENIX_COLLECTOR_ENDPOINT", PHOENIX_ENDPOINT + "/v1/traces")
-    os.environ.setdefault("PHOENIX_CLIENT_HEADERS", "api-key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.nf7V-hnJXR3mtIBYvTc7KHaAjclvuEhpDFa8A5aCsPY")
+    os.environ["PHOENIX_API_KEY"] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MyJ9.G3anSj4kWc9mAw4tZ0hNj3I8cgUrYetmOhOI2kXBCtI"
+    os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = PHOENIX_ENDPOINT + "/v1/traces"
+    os.environ["OTEL_EXPORTER_OTLP_HEADERS"] = "Authorization=Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MyJ9.G3anSj4kWc9mAw4tZ0hNj3I8cgUrYetmOhOI2kXBCtI"
     from phoenix.otel import register
     from openinference.instrumentation.google_adk import GoogleADKInstrumentor
     
     tracer_provider = register(
         project_name=PROJECT_NAME,
         endpoint=PHOENIX_ENDPOINT + "/v1/traces",
-        headers={"api-key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.nf7V-hnJXR3mtIBYvTc7KHaAjclvuEhpDFa8A5aCsPY"},
         auto_instrument=True,
     )
     GoogleADKInstrumentor().instrument(tracer_provider=tracer_provider)

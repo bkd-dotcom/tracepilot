@@ -189,9 +189,9 @@ def get_traces():
     try:
         from phoenix.client import Client
         import os
-        os.environ.pop("PHOENIX_CLIENT_HEADERS", None)
-        os.environ.pop("PHOENIX_COLLECTOR_ENDPOINT", None)
-        client = Client(base_url="https://app.phoenix.arize.com", api_key="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.nf7V-hnJXR3mtIBYvTc7KHaAjclvuEhpDFa8A5aCsPY")
+        os.environ["PHOENIX_API_KEY"] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MyJ9.G3anSj4kWc9mAw4tZ0hNj3I8cgUrYetmOhOI2kXBCtI"
+        os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com"
+        client = Client()
         df = client.spans.get_spans_dataframe(project_name=PROJECT_NAME)
         if df is None or df.empty:
             return {"status": "success", "data": []}
