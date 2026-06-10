@@ -1,3 +1,12 @@
+---
+title: TracePilot
+emoji: 🚀
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+---
+
 # TracePilot
 
 > **Note for Judges (Hosted Project):** Local-first architecture to protect enterprise data—requires local execution to view the Arize Phoenix telemetry dashboard. Please follow the instructions below to run locally.
