@@ -580,3 +580,13 @@ input[type="text"]:focus, textarea:focus {
 .chip:hover {
     background: var(--bg-hover) !important;
 }
+
+/* Theme Toggle Smooth Transition */
+#btn-theme-toggle {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+#btn-theme-toggle.rotating {
+    transform: rotate(90deg) scale(0.5);
+    opacity: 0;
+}

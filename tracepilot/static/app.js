@@ -39,14 +39,18 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (btnThemeToggle) {
         btnThemeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-theme');
-            if (document.body.classList.contains('dark-theme')) {
-                localStorage.setItem('theme', 'dark');
-                btnThemeToggle.innerHTML = SUN_SVG;
-            } else {
-                localStorage.setItem('theme', 'light');
-                btnThemeToggle.innerHTML = MOON_SVG;
-            }
+            btnThemeToggle.classList.add('rotating');
+            setTimeout(() => {
+                document.body.classList.toggle('dark-theme');
+                if (document.body.classList.contains('dark-theme')) {
+                    localStorage.setItem('theme', 'dark');
+                    btnThemeToggle.innerHTML = SUN_SVG;
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    btnThemeToggle.innerHTML = MOON_SVG;
+                }
+                setTimeout(() => btnThemeToggle.classList.remove('rotating'), 50);
+            }, 300);
         });
     }
 
