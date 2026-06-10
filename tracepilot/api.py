@@ -115,9 +115,11 @@ def handle_query(request: QueryRequest):
     from concurrent.futures import ThreadPoolExecutor
     try:
         # Run in a separate thread to avoid Google ADK / httpx async conflicts without process overhead
+        print(f"[DEBUG API] Received request.query: '{request.query}'")
         with ThreadPoolExecutor(max_workers=1) as executor:
             future = executor.submit(_run_threaded_query, request.query)
             result = future.result()
+        print(f"[DEBUG API] Returning result: {str(result)[:200]}")
         return {"status": "success", "response": result}
     except Exception as e:
         import traceback

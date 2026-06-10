@@ -164,9 +164,11 @@ async def run_query(query: str, db_path: str = "tracepilot_memory.db") -> str:
         if tool_result.get("status") == "success":
             result_text = tool_result.get("content", "")
             success = True
+            print(f"[DEBUG] Verbatim tool success. Output: {result_text[:50]}...")
         else:
             result_text = f"TOOL_ERROR: {tool_result.get('error', 'Unknown Error')}"
             success = False
+            print(f"[DEBUG] Verbatim tool failure. Output: {result_text}")
         
     primary_latency = time.time() - start_time
     primary_cost = TOOL_COSTS[selected_tool]
