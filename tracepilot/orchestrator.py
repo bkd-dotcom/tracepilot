@@ -33,16 +33,21 @@ import re
 def classify_query(query: str) -> str:
     """Classify a query as 'uploaded', 'internal', or 'public'."""
     query_lower = query.lower()
-    query_words = set(re.findall(r'\b\w{3,}\b', query_lower))
-
+    
     # Check if any uploaded document matches
-    if os.path.exists("data"):
-        for filename in os.listdir("data"):
-            if not filename.startswith("."):
-                doc_name = os.path.splitext(filename)[0].lower()
-                doc_words = set(re.findall(r'\b\w{3,}\b', doc_name))
-                if doc_words.intersection(query_words) or doc_name in query_lower:
-                    return "uploaded"
+    try:
+        import json
+        data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
+        file_path = os.path.join(data_dir, "uploaded_docs.json")
+        if os.path.exists(file_path):
+            with open(file_path, "r") as f:
+                docs = json.load(f)
+            for doc in docs:
+                for kw in doc.get("keywords", []):
+                    if kw.lower() in query_lower:
+                        return "uploaded"
+    except Exception:
+        pass
 
     internal_keywords = [
         "employee", "handbook", "policy", "hr", "internal", "company",
@@ -66,9 +71,10 @@ def _create_agent(tool_func) -> Agent:
         instruction=(
             "You are TracePilot, an enterprise assistant. "
             "You MUST use the provided tool to answer the user's question. "
+            "It is strictly forbidden to answer from your own knowledge. "
             "Always call the tool first before responding, even for general questions. "
             "If the tool returns an error, you MUST start your response with exactly the word 'TOOL_ERROR'. "
-            "Never refuse to answer a question."
+            "Provide a VERY CONCISE answer (1-2 sentences) to minimize response latency."
         ),
         tools=[tool_func],
     )
@@ -86,12 +92,15 @@ async def _run_agent(agent: Agent, query: str) -> tuple[str, bool]:
     )
     
     result_text = ""
+    # Force the LLM to call the tool by appending an explicit instruction to the user's query
+    forced_query = query + "\n\n(System Instruction: You MUST use your provided tool to answer this query. Do not answer from your own knowledge.)"
+    
     async for event in runner.run_async(
         user_id="demo_user",
         session_id=session.id,
         new_message=types.Content(
             role="user",
-            parts=[types.Part(text=query)]
+            parts=[types.Part(text=forced_query)]
         ),
     ):
         if event.is_final_response() and event.content and event.content.parts:
