@@ -4,6 +4,8 @@
 
 TracePilot is an autonomous enterprise routing agent that **learns from its own observability traces** rather than relying on hardcoded LLM prompts. Built using the Google Agent Development Kit (ADK) and Arize Phoenix for the Google Cloud Rapid Agent Hackathon.
 
+### 🌐 For the live demo: click this url -> [https://tracepilot-712918182816.us-central1.run.app](https://tracepilot-712918182816.us-central1.run.app)
+
 ## The Core Concept: Why Not Just Use an LLM Router?
 
 In a standard agentic architecture, developers use an LLM as a "Router" (e.g., prompting it with *"If the user asks about Python, use the web search. If they ask about employee policies, use the internal database."*)
