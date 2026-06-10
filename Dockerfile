@@ -45,7 +45,11 @@ EXPOSE 7860
 
 # Create a startup script
 RUN echo '#!/bin/bash\n\
-# Using Arize Phoenix Cloud API for observability\n\
+# Start the local Open-Source Phoenix Server in the background\n\
+python -m phoenix.server.main serve --host 0.0.0.0 --port 6006 &\n\
+\n\
+# Wait for Phoenix to start\n\
+sleep 5\n\
 \n\
 # Start the FastAPI application on the port HuggingFace expects\n\
 uvicorn tracepilot.api:app --host 0.0.0.0 --port 7860\n\

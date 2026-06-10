@@ -27,8 +27,7 @@ async def async_run_audit(db_path: str = "tracepilot_memory.db"):
             server_params=StdioServerParameters(
                 command="phoenix-mcp",
                 args=[
-                    "--baseUrl", "https://app.phoenix.arize.com/s/tracepilot",
-                    "--apiKey", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.bw5w46vTPfXxGuTqGjyj3gsUG2MsnZhVN07m70HI0WQ"
+                    "--baseUrl", "http://127.0.0.1:6006"
                 ]
             )
         ),
