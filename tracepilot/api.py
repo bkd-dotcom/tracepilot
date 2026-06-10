@@ -220,16 +220,13 @@ def get_traces():
         from phoenix.client import Client
         import os
         os.environ["PHOENIX_API_KEY"] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.bw5w46vTPfXxGuTqGjyj3gsUG2MsnZhVN07m70HI0WQ"
-        os.environ["PHOENIX_CLIENT_HEADERS"] = "api_key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.bw5w46vTPfXxGuTqGjyj3gsUG2MsnZhVN07m70HI0WQ"
         
-        # Temporarily use base URL so Client can fetch correctly without v1/traces appending
-        os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com/s/tracepilot"
+        # Remove any incorrect endpoints so Client correctly auto-discovers the cloud
+        os.environ.pop("PHOENIX_COLLECTOR_ENDPOINT", None)
+        
         import httpx
         client = Client()
         client._client.timeout = httpx.Timeout(30.0)
-        
-        # Restore for any subsequent OTLP exports
-        os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com/s/tracepilot/v1/traces"
         
         df = client.spans.get_spans_dataframe(project_name=PROJECT_NAME)
         if df is None or df.empty:
