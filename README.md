@@ -1,11 +1,3 @@
----
-title: TracePilot
-emoji: 🚀
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-app_port: 7860
----
 
 <p align="center">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="100%">
