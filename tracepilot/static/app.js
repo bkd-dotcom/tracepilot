@@ -43,6 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Logout Logic
+    const btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', () => {
+            window.location.href = '/';
+        });
+    }
+
     const HR_QUERY = "Find employee handbook section 7.3";
 
     // Chart.js Setup
