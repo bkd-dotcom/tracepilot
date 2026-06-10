@@ -7,8 +7,8 @@ from tracepilot.config import PHOENIX_ENDPOINT, PROJECT_NAME
 def init_tracing():
     """Initialize Phoenix tracing. Must be called BEFORE any agent code."""
     # Set environment variable for Phoenix endpoint
-    os.environ.setdefault("PHOENIX_COLLECTOR_ENDPOINT", PHOENIX_ENDPOINT)
-    
+    os.environ.setdefault("PHOENIX_COLLECTOR_ENDPOINT", PHOENIX_ENDPOINT + "/v1/traces")
+    os.environ.setdefault("PHOENIX_CLIENT_HEADERS", "api_key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.nf7V-hnJXR3mtIBYvTc7KHaAjclvuEhpDFa8A5aCsPY")
     from phoenix.otel import register
     from openinference.instrumentation.google_adk import GoogleADKInstrumentor
     

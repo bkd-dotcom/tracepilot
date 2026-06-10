@@ -18,8 +18,7 @@ def internal_kb_search(query: str) -> dict:
     except Exception as e:
         return {"status": "error", "source": "internal_kb", "error": f"Failed to load KB: {e}"}
 
-    # Artificial latency for internal tools (fast)
-    time.sleep(random.uniform(0.1, 0.3))
+    # Artificial latency removed
 
     query_lower = query.lower()
     for entry in kb_data.get("entries", []):
@@ -41,8 +40,7 @@ def internal_kb_search(query: str) -> dict:
 def web_search(query: str) -> dict:
     """Simulates an expensive, slow web search."""
     
-    # Intentionally bloat the latency for the demo graph
-    time.sleep(3.5) 
+    # Removed artificial latency to make model work normally
     
     # Force a failure if it's an internal company query
     internal_keywords = ['handbook', 'pto', 'employee', 'policy']
@@ -70,7 +68,7 @@ def uploaded_documents_search(query: str) -> dict:
         return {"status": "error", "source": "uploaded_documents", "error": "No uploaded documents available."}
         
     # Extremely fast since it's "local" memory
-    time.sleep(random.uniform(0.01, 0.05))
+    pass
     
     query_lower = query.lower()
     for doc in docs:

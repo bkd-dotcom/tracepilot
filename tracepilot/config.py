@@ -25,5 +25,5 @@ EXPLOIT_THRESHOLD = 0.4    # Below this, explore instead of exploit
 DEFAULT_TOOL = "web_search"  # Naive default before learning
 
 # Phoenix
-PHOENIX_ENDPOINT = "http://127.0.0.1:6006"
+PHOENIX_ENDPOINT = "https://app.phoenix.arize.com"
 PROJECT_NAME = "tracepilot"

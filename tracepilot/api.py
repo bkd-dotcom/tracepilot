@@ -188,7 +188,10 @@ def get_traces():
     import pandas as pd
     try:
         from phoenix.client import Client
-        client = Client(base_url=PHOENIX_ENDPOINT)
+        import os
+        os.environ["PHOENIX_CLIENT_HEADERS"] = "api_key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.nf7V-hnJXR3mtIBYvTc7KHaAjclvuEhpDFa8A5aCsPY"
+        os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com"
+        client = Client()
         df = client.spans.get_spans_dataframe(project_name=PROJECT_NAME)
         if df is None or df.empty:
             return {"status": "success", "data": []}
@@ -231,4 +234,7 @@ def get_traces():
         
         return {"status": "success", "data": clean_data[::-1]}
     except Exception as e:
-        return {"status": "success", "data": []}
+        import traceback
+        traceback.print_exc()
+        print(f"Exception in get_traces: {e}")
+        return {"status": "error", "data": []}
