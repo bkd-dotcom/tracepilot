@@ -27,8 +27,23 @@ TOOL_MAP = {
 
 
 
+import os
+import re
+
 def classify_query(query: str) -> str:
-    """Classify a query as 'internal' or 'public' using keyword heuristics."""
+    """Classify a query as 'uploaded', 'internal', or 'public'."""
+    query_lower = query.lower()
+    query_words = set(re.findall(r'\b\w{3,}\b', query_lower))
+
+    # Check if any uploaded document matches
+    if os.path.exists("data"):
+        for filename in os.listdir("data"):
+            if not filename.startswith("."):
+                doc_name = os.path.splitext(filename)[0].lower()
+                doc_words = set(re.findall(r'\b\w{3,}\b', doc_name))
+                if doc_words.intersection(query_words) or doc_name in query_lower:
+                    return "uploaded"
+
     internal_keywords = [
         "employee", "handbook", "policy", "hr", "internal", "company",
         "section", "procedure", "onboarding", "offboarding", "expense",
@@ -37,7 +52,6 @@ def classify_query(query: str) -> str:
         "dress code", "remote work", "equipment", "safety", "retirement",
         "stock option", "complaint",
     ]
-    query_lower = query.lower()
     for kw in internal_keywords:
         if kw in query_lower:
             return "internal"

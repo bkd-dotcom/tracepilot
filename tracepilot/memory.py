@@ -158,8 +158,9 @@ def get_optimal_routing(task_category: str, db_path: str = "tracepilot_memory.db
         })
 
     if not rows:
+        default_for_cat = "uploaded_documents" if task_category == "uploaded" else DEFAULT_TOOL
         return {
-            "tool": DEFAULT_TOOL,
+            "tool": default_for_cat,
             "confidence": 0.5,
             "mode": "explore",
             "all_options": []
