@@ -74,7 +74,7 @@ def _create_agent(tool_func) -> Agent:
             "It is strictly forbidden to answer from your own knowledge. "
             "Always call the tool first before responding, even for general questions. "
             "If the tool returns an error, you MUST start your response with exactly the word 'TOOL_ERROR'. "
-            "Provide a VERY CONCISE answer (1-2 sentences) to minimize response latency."
+            "IMPORTANT: When the tool returns content from a document, you must output the EXACT verbatim text from the tool. Do not paraphrase, summarize, or make up your own answer."
         ),
         tools=[tool_func],
     )
