@@ -32,5 +32,37 @@
     "metrics": {
       "corrections": 1
     }
+  },
+  {
+    "id": 4,
+    "timestamp": "2026-06-09T20:21:24.038895",
+    "type": "routing",
+    "title": "Routing Decision",
+    "description": "Routed query to 'uploaded_documents' (Confidence: 0.33)",
+    "metrics": {
+      "mode": "explore",
+      "options": [
+        {
+          "tool": "web_search",
+          "confidence": 0.33,
+          "success_rate": 0.0,
+          "avg_cost": 0.12,
+          "avg_recovery_cost": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "id": 5,
+    "timestamp": "2026-06-09T20:21:30.068281",
+    "type": "system",
+    "title": "Execution Complete",
+    "description": "Query executed via 'uploaded_documents' in 6.02s",
+    "metrics": {
+      "latency": 6.022744178771973,
+      "cost": 0.005,
+      "recovery_cost": 0.0,
+      "success": true
+    }
   }
 ]

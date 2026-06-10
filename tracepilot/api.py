@@ -87,8 +87,19 @@ def _run_isolated_query(q: str):
     import asyncio
     from dotenv import load_dotenv
     load_dotenv()
+    
+    # Initialize tracing in the child process
+    from tracepilot.tracing import init_tracing
+    tracer_provider = init_tracing()
+    
     from tracepilot.orchestrator import run_query
-    return asyncio.run(run_query(q))
+    result = asyncio.run(run_query(q))
+    
+    # Force flush so traces are immediately available in Phoenix
+    if hasattr(tracer_provider, 'force_flush'):
+        tracer_provider.force_flush()
+        
+    return result
 
 @app.post("/api/query")
 def handle_query(request: QueryRequest):
