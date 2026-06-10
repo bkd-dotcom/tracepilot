@@ -3,61 +3,61 @@
     {
       "id": "hb_7_1",
       "title": "Employee Handbook 7.1: Workplace Conduct",
-      "keywords": ["conduct", "behavior", "handbook section 7.1", "harassment", "respect", "workplace"],
+      "keywords": ["conduct", "behavior", "handbook section 7.1", "7.1", "harassment", "respect", "workplace"],
       "content": "All employees are expected to treat colleagues with respect and professionalism. We maintain a zero-tolerance policy for harassment, discrimination, or bullying of any kind."
     },
     {
       "id": "hb_7_2",
       "title": "Employee Handbook 7.2: Dress Code",
-      "keywords": ["dress code", "attire", "clothing", "handbook section 7.2", "casual", "business"],
+      "keywords": ["dress code", "attire", "clothing", "handbook section 7.2", "7.2", "casual", "business"],
       "content": "Our office has a 'dress for your day' policy. Business casual is the default, but casual attire is acceptable unless meeting with clients or external partners."
     },
     {
       "id": "hb_7_3",
       "title": "Employee Handbook 7.3: Remote Work",
-      "keywords": ["remote work", "work from home", "wfh", "handbook section 7.3", "telecommute"],
+      "keywords": ["remote work", "work from home", "wfh", "handbook section 7.3", "7.3", "telecommute"],
       "content": "Employees may work remotely up to two days per week with manager approval. Core hours of 10 AM to 3 PM apply regardless of location."
     },
     {
       "id": "hb_7_4",
       "title": "Employee Handbook 7.4: Equipment Usage",
-      "keywords": ["equipment", "laptop", "devices", "handbook section 7.4", "it policy", "hardware"],
+      "keywords": ["equipment", "laptop", "devices", "handbook section 7.4", "7.4", "it policy", "hardware"],
       "content": "Company-provided equipment is for business use only. Employees are responsible for securing their devices and immediately reporting any loss or theft to IT Support."
     },
     {
       "id": "hb_7_5",
       "title": "Employee Handbook 7.5: Workplace Safety",
-      "keywords": ["safety", "hazards", "emergency", "handbook section 7.5", "health", "injury"],
+      "keywords": ["safety", "hazards", "emergency", "handbook section 7.5", "7.5", "health", "injury"],
       "content": "Report any safety hazards or workplace injuries to Facilities immediately. In an emergency, follow the posted evacuation routes and gather at the designated assembly point."
     },
     {
       "id": "hb_8_1",
       "title": "Employee Handbook 8.1: Compensation",
-      "keywords": ["compensation", "salary", "pay", "handbook section 8.1", "payroll", "direct deposit"],
+      "keywords": ["compensation", "salary", "pay", "handbook section 8.1", "8.1", "payroll", "direct deposit"],
       "content": "Employees are paid semi-monthly on the 15th and last day of the month via direct deposit. Salary reviews occur annually in Q1."
     },
     {
       "id": "hb_8_2",
       "title": "Employee Handbook 8.2: Benefits Overview",
-      "keywords": ["benefits", "health insurance", "dental", "vision", "handbook section 8.2"],
+      "keywords": ["benefits", "health insurance", "dental", "vision", "handbook section 8.2", "8.2"],
       "content": "Full-time employees are eligible for comprehensive health, dental, and vision insurance starting on their first day of employment."
     },
     {
       "id": "hb_8_3",
       "title": "Employee Handbook 8.3: Paid Time Off (PTO)",
-      "keywords": ["pto", "vacation", "sick leave", "time off", "handbook section 8.3", "holidays"],
+      "keywords": ["pto", "vacation", "sick leave", "time off", "handbook section 8.3", "8.3", "holidays"],
       "content": "We offer flexible PTO for salaried employees. Hourly employees accrue 15 days of PTO annually. Sick leave is separate and provides up to 10 days per year."
     },
     {
       "id": "hb_8_4",
       "title": "Employee Handbook 8.4: Retirement Plans",
-      "keywords": ["retirement", "401k", "matching", "handbook section 8.4", "pension"],
+      "keywords": ["retirement", "401k", "matching", "handbook section 8.4", "8.4", "pension"],
       "content": "The company offers a 401(k) plan with a 100% match on the first 4% of employee contributions. Vesting is immediate."
     },
     {
       "id": "hb_8_5",
       "title": "Employee Handbook 8.5: Stock Options",
-      "keywords": ["stock options", "equity", "vesting", "handbook section 8.5", "shares"],
+      "keywords": ["stock options", "equity", "vesting", "handbook section 8.5", "8.5", "shares"],
       "content": "Eligible employees receive stock options subject to a 4-year vesting schedule with a 1-year cliff."
     },
     {
