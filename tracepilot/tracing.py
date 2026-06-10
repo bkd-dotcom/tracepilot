@@ -14,6 +14,8 @@ def init_tracing():
     
     tracer_provider = register(
         project_name=PROJECT_NAME,
+        endpoint=PHOENIX_ENDPOINT + "/v1/traces",
+        headers={"api-key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.nf7V-hnJXR3mtIBYvTc7KHaAjclvuEhpDFa8A5aCsPY"},
         auto_instrument=True,
     )
     GoogleADKInstrumentor().instrument(tracer_provider=tracer_provider)
