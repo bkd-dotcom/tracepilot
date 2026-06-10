@@ -192,9 +192,12 @@ def get_traces():
         os.environ["PHOENIX_API_KEY"] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.bw5w46vTPfXxGuTqGjyj3gsUG2MsnZhVN07m70HI0WQ"
         os.environ["PHOENIX_CLIENT_HEADERS"] = "api_key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.bw5w46vTPfXxGuTqGjyj3gsUG2MsnZhVN07m70HI0WQ"
         
-        # OTLP needs /v1/traces, but Client needs the base workspace URL
+        # Temporarily use base URL so Client can fetch correctly without v1/traces appending
+        os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com/s/tracepilot"
+        client = Client()
+        
+        # Restore for any subsequent OTLP exports
         os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com/s/tracepilot/v1/traces"
-        client = Client(endpoint="https://app.phoenix.arize.com/s/tracepilot")
         
         df = client.spans.get_spans_dataframe(project_name=PROJECT_NAME)
         if df is None or df.empty:

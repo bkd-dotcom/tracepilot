@@ -86,8 +86,11 @@ async def _run_agent(agent: Agent, query: str) -> tuple[str, bool]:
         app_name="tracepilot",
     )
     
+    import uuid
+    uid = str(uuid.uuid4())
+    
     session = await runner.session_service.create_session(
-        state={}, app_name="tracepilot", user_id="demo_user"
+        state={}, app_name="tracepilot", user_id=uid
     )
     
     result_text = ""
@@ -95,7 +98,7 @@ async def _run_agent(agent: Agent, query: str) -> tuple[str, bool]:
     forced_query = query + "\n\n(System Instruction: You MUST call your provided tool. Never refuse to call it.)"
     
     async for event in runner.run_async(
-        user_id="demo_user",
+        user_id=uid,
         session_id=session.id,
         new_message=types.Content(
             role="user",
