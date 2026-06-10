@@ -71,9 +71,11 @@ def uploaded_documents_search(query: str) -> dict:
     pass
     
     query_lower = query.lower()
+    import re
     for doc in docs:
         for kw in doc.get("keywords", []):
-            if kw.lower() in query_lower:
+            # Use word boundaries for uploaded document keywords since they are single words
+            if re.search(r'\b' + re.escape(kw.lower()) + r'\b', query_lower):
                 return {
                     "status": "success",
                     "source": "uploaded_documents",

@@ -49,7 +49,7 @@ def handle_upload(request: UploadRequest):
         # Extract alphanumeric words >= 3 characters
         words = re.findall(r'\b[a-zA-Z0-9]{3,}\b', full_text)
         # Exclude common stop words
-        stop_words = {"this", "that", "with", "from", "your", "have", "they", "will", "would", "what", "when", "where", "which"}
+        stop_words = {"this", "that", "with", "from", "your", "have", "they", "will", "would", "what", "when", "where", "which", "and", "for", "the", "are", "is", "it", "you"}
         words = [w for w in words if w not in stop_words]
         
         # Get top 5 keywords
