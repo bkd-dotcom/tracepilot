@@ -160,3 +160,31 @@ def get_documents():
             return {"status": "success", "data": docs}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/traces")
+def get_traces():
+    from tracepilot.config import PROJECT_NAME
+    try:
+        from phoenix.client import Client
+        client = Client()
+        df = client.spans.get_spans_dataframe(project_name=PROJECT_NAME)
+        if df is None or df.empty:
+            return {"status": "success", "data": []}
+        
+        tool_spans = df[df.get("span_kind", "") == "TOOL"] if "span_kind" in df.columns else df
+        recent = tool_spans.tail(15).fillna("").to_dict(orient="records")
+        
+        clean_data = []
+        for r in recent:
+            output_val = str(r.get("attributes.output.value", ""))
+            status = "Error" if '"status": "error"' in output_val or "'status': 'error'" in output_val else "Success"
+            clean_data.append({
+                "name": str(r.get("name", "Unknown")).replace("execute_tool ", ""),
+                "status": status,
+                "latency": round(r.get("latency_ms", 0) / 1000, 3) if "latency_ms" in r else 0,
+                "time": str(r.get("start_time", ""))[:19]
+            })
+        
+        return {"status": "success", "data": clean_data[::-1]}
+    except Exception as e:
+        return {"status": "success", "data": []}

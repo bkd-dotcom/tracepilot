@@ -56,6 +56,30 @@
         </div>
     </div>
 
+    <!-- Traces Modal -->
+    <div id="traces-modal" class="modal hidden">
+        <div class="modal-content glass" style="max-width: 800px;">
+            <span class="close-btn" id="close-traces-modal">&times;</span>
+            <h2>Phoenix Trace History</h2>
+            <p class="modal-subtitle">Raw OpenTelemetry spans pulled directly from the Arize Phoenix SDK.</p>
+            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                <table id="traces-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Span Name</th>
+                            <th>Status (Parsed)</th>
+                            <th>Latency (s)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="traces-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Header -->
         <header class="app-header">
@@ -107,7 +131,10 @@
             <section class="pane observability-pane">
                 <div class="pane-header">
                     <h2>Economic Memory</h2>
-                    <button id="btn-run-auditor" class="btn magic highlight" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Run Phoenix Auditor</button>
+                    <div>
+                        <button id="btn-view-traces" class="btn outline" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; margin-right: 0.5rem;">Phoenix Traces</button>
+                        <button id="btn-run-auditor" class="btn magic highlight" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Run Phoenix Auditor</button>
+                    </div>
                 </div>
                 
                 <div class="table-container">

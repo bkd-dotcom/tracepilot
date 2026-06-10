@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": 1,
+    "timestamp": "2026-06-09T20:11:38.724910",
+    "type": "routing",
+    "title": "Routing Decision",
+    "description": "Routed query to 'web_search' (Confidence: 0.50)",
+    "metrics": {
+      "mode": "explore",
+      "options": []
+    }
+  },
+  {
+    "id": 2,
+    "timestamp": "2026-06-09T20:11:56.927423",
+    "type": "system",
+    "title": "Execution Complete",
+    "description": "Query executed via 'web_search \u2192 internal_kb' in 18.19s",
+    "metrics": {
+      "latency": 18.192461013793945,
+      "cost": 0.13,
+      "recovery_cost": 0.12,
+      "success": true
+    }
+  }
+]

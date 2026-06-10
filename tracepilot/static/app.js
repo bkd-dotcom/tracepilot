@@ -25,6 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeAdminModal = document.getElementById('close-admin-modal');
     const adminBody = document.getElementById('admin-body');
 
+    // Traces Modal Elements
+    const btnViewTraces = document.getElementById('btn-view-traces');
+    const tracesModal = document.getElementById('traces-modal');
+    const closeTracesModal = document.getElementById('close-traces-modal');
+    const tracesBody = document.getElementById('traces-body');
+
     // Theme Toggle Logic
     const SUN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
     const MOON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9.01 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
@@ -162,6 +168,20 @@ document.addEventListener('DOMContentLoaded', () => {
     closeAdminModal.addEventListener('click', () => {
         adminModal.classList.add('hidden');
     });
+
+    // Traces Modal listeners
+    if (btnViewTraces) {
+        btnViewTraces.addEventListener('click', async () => {
+            tracesModal.classList.remove('hidden');
+            await fetchTraces();
+        });
+    }
+    
+    if (closeTracesModal) {
+        closeTracesModal.addEventListener('click', () => {
+            tracesModal.classList.add('hidden');
+        });
+    }
 
     btnSubmitUpload.addEventListener('click', async () => {
         const title = uploadTitle.value.trim();
@@ -450,6 +470,35 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } catch (e) {
             console.error(e);
+        }
+    }
+
+    async function fetchTraces() {
+        try {
+            tracesBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading traces from Phoenix SDK...</td></tr>';
+            const res = await fetch('/api/traces');
+            const data = await res.json();
+            
+            tracesBody.innerHTML = '';
+            if(!data.data || data.data.length === 0) {
+                tracesBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-secondary)">No traces found. Is Phoenix running?</td></tr>';
+                return;
+            }
+            
+            data.data.forEach(trace => {
+                const tr = document.createElement('tr');
+                const statusColor = trace.status === 'Success' ? 'var(--google-green)' : 'var(--google-red)';
+                tr.innerHTML = `
+                    <td style="font-size:0.85rem; color:var(--text-secondary);">${trace.time}</td>
+                    <td style="font-weight:500;">${trace.name}</td>
+                    <td style="color:${statusColor}; font-weight:500;">${trace.status}</td>
+                    <td style="font-family:monospace;">${trace.latency.toFixed(3)}s</td>
+                `;
+                tracesBody.appendChild(tr);
+            });
+        } catch (e) {
+            console.error(e);
+            tracesBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--google-red)">Failed to load traces.</td></tr>';
         }
     }
 });
