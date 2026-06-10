@@ -33,7 +33,7 @@ ENV PORT=7860
 # Set Phoenix to run on a different internal port
 ENV PHOENIX_PORT=6006
 # Tell tracing to use the internal Phoenix endpoint
-ENV PHOENIX_COLLECTOR_ENDPOINT=http://localhost:6006
+ENV PHOENIX_COLLECTOR_ENDPOINT=http://127.0.0.1:6006
 
 # Expose the port HuggingFace expects
 EXPOSE 7860
@@ -41,7 +41,7 @@ EXPOSE 7860
 # Create a startup script
 RUN echo '#!/bin/bash\n\
 # Start Phoenix Server in the background\n\
-python -m phoenix.server.main serve --port 6006 &\n\
+python -m phoenix.server.main serve --host 127.0.0.1 --port 6006 &\n\
 \n\
 # Wait a few seconds for Phoenix to initialize\n\
 sleep 5\n\
