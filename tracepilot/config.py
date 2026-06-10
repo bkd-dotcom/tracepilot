@@ -1,7 +1,7 @@
 """TracePilot configuration constants."""
 
 # Model
-MODEL_NAME = "gemini-1.5-flash"
+MODEL_NAME = "gemini-2.5-flash"
 
 # Tool costs (hardcoded for hackathon)
 TOOL_COSTS = {
