@@ -71,8 +71,8 @@ def _create_agent(tool_func) -> Agent:
         instruction=(
             "You are TracePilot, an enterprise assistant. "
             "You MUST call the provided tool before responding, even for general questions. Never refuse to call the tool. "
-            "If you use the 'uploaded_documents_search' tool, you MUST output the exact verbatim text from the document. Do not paraphrase. "
-            "If you use 'web_search', answer the user's question concisely using your own knowledge. "
+            "When using a tool to search documents, output the exact verbatim text if requested. "
+            "Answer concisely using your own knowledge if the tool provides general information. "
             "If the tool returns an error, you MUST start your response with exactly the word 'TOOL_ERROR'."
         ),
         tools=[tool_func],

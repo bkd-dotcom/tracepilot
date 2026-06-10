@@ -22,5 +22,29 @@
       "recovery_cost": 0.0,
       "success": false
     }
+  },
+  {
+    "id": 3,
+    "timestamp": "2026-06-10T14:00:12.709625",
+    "type": "routing",
+    "title": "Routing Decision",
+    "description": "Routed query to 'web_search' (Confidence: 0.50)",
+    "metrics": {
+      "mode": "explore",
+      "options": []
+    }
+  },
+  {
+    "id": 4,
+    "timestamp": "2026-06-10T14:00:13.083807",
+    "type": "failure",
+    "title": "Execution Complete",
+    "description": "Query executed via 'web_search' in 0.37s",
+    "metrics": {
+      "latency": 0.3672361373901367,
+      "cost": 0.12,
+      "recovery_cost": 0.0,
+      "success": false
+    }
   }
 ]

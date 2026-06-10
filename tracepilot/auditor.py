@@ -19,8 +19,8 @@ def run_audit(db_path: str = "tracepilot_memory.db") -> None:
     
     try:
         import os
-        os.environ["PHOENIX_API_KEY"] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MyJ9.G3anSj4kWc9mAw4tZ0hNj3I8cgUrYetmOhOI2kXBCtI"
-        os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com"
+        os.environ["PHOENIX_API_KEY"] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6NCJ9.Kw9QTuiZisT-fI7Z9QRXpomv9p37mw_jDrJ-1lMUvlc"
+        os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com/s/tracepilot"
         client = Client()
         # Query spans from the tracepilot project
         spans_df = client.spans.get_spans_dataframe(
