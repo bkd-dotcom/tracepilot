@@ -1,22 +1,7 @@
 # **TracePilot: Self-Healing Agents through Observability**
 
 <p align="center">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="100%">
-    <defs>
-      <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style="stop-color:#0f2027;stop-opacity:1" />
-        <stop offset="50%" style="stop-color:#203a43;stop-opacity:1" />
-        <stop offset="100%" style="stop-color:#2c5364;stop-opacity:1" />
-      </linearGradient>
-      <linearGradient id="text-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" style="stop-color:#00c6ff;stop-opacity:1" />
-        <stop offset="100%" style="stop-color:#0072ff;stop-opacity:1" />
-      </linearGradient>
-    </defs>
-    <rect width="100%" height="100%" rx="20" fill="url(#bg-grad)"/>
-    <text x="50%" y="45%" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="72" font-weight="900" fill="url(#text-grad)" text-anchor="middle" dominant-baseline="middle" letter-spacing="2">TracePilot</text>
-    <text x="50%" y="75%" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="22" font-weight="400" fill="#e0e0e0" text-anchor="middle" dominant-baseline="middle" letter-spacing="1">Self-Healing Agents through Observability</text>
-  </svg>
+  <img src="logo.svg" width="100%" alt="TracePilot Logo">
 </p>
 
 TracePilot is an autonomous enterprise routing agent that **learns from its own observability traces** rather than relying on hardcoded LLM prompts. Built using the Google Agent Development Kit (ADK) and Arize Phoenix for the Google Cloud Rapid Agent Hackathon.
