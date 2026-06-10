@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "timestamp": "2026-06-09T20:18:09.936236",
+    "timestamp": "2026-06-09T20:24:53.930254",
     "type": "routing",
     "title": "Routing Decision",
     "description": "Routed query to 'web_search' (Confidence: 0.50)",
@@ -12,12 +12,12 @@
   },
   {
     "id": 2,
-    "timestamp": "2026-06-09T20:18:18.205542",
+    "timestamp": "2026-06-09T20:25:01.315803",
     "type": "system",
     "title": "Execution Complete",
-    "description": "Query executed via 'web_search' in 8.26s",
+    "description": "Query executed via 'web_search' in 7.38s",
     "metrics": {
-      "latency": 8.26410984992981,
+      "latency": 7.3790199756622314,
       "cost": 0.12,
       "recovery_cost": 0.0,
       "success": true
@@ -25,7 +25,7 @@
   },
   {
     "id": 3,
-    "timestamp": "2026-06-09T20:18:27.440245",
+    "timestamp": "2026-06-09T20:25:16.019800",
     "type": "learning",
     "title": "Memory Correction",
     "description": "Auditor found 1 hidden LLM failure(s). Confidence scores recalculated.",
@@ -35,7 +35,7 @@
   },
   {
     "id": 4,
-    "timestamp": "2026-06-09T20:21:24.038895",
+    "timestamp": "2026-06-09T20:25:30.815302",
     "type": "routing",
     "title": "Routing Decision",
     "description": "Routed query to 'uploaded_documents' (Confidence: 0.33)",
@@ -54,12 +54,181 @@
   },
   {
     "id": 5,
-    "timestamp": "2026-06-09T20:21:30.068281",
+    "timestamp": "2026-06-09T20:25:33.856711",
     "type": "system",
     "title": "Execution Complete",
-    "description": "Query executed via 'uploaded_documents' in 6.02s",
+    "description": "Query executed via 'uploaded_documents' in 3.04s",
     "metrics": {
-      "latency": 6.022744178771973,
+      "latency": 3.0355570316314697,
+      "cost": 0.005,
+      "recovery_cost": 0.0,
+      "success": true
+    }
+  },
+  {
+    "id": 6,
+    "timestamp": "2026-06-09T20:25:50.418898",
+    "type": "routing",
+    "title": "Routing Decision",
+    "description": "Routed query to 'uploaded_documents' (Confidence: 0.90)",
+    "metrics": {
+      "mode": "exploit",
+      "options": [
+        {
+          "tool": "uploaded_documents",
+          "confidence": 0.9,
+          "success_rate": 100.0,
+          "avg_cost": 0.005,
+          "avg_recovery_cost": 0.0
+        },
+        {
+          "tool": "web_search",
+          "confidence": 0.33,
+          "success_rate": 0.0,
+          "avg_cost": 0.12,
+          "avg_recovery_cost": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "id": 7,
+    "timestamp": "2026-06-09T20:25:53.287544",
+    "type": "system",
+    "title": "Execution Complete",
+    "description": "Query executed via 'uploaded_documents' in 2.86s",
+    "metrics": {
+      "latency": 2.8628060817718506,
+      "cost": 0.005,
+      "recovery_cost": 0.0,
+      "success": true
+    }
+  },
+  {
+    "id": 8,
+    "timestamp": "2026-06-09T20:26:16.812953",
+    "type": "routing",
+    "title": "Routing Decision",
+    "description": "Routed query to 'uploaded_documents' (Confidence: 0.91)",
+    "metrics": {
+      "mode": "exploit",
+      "options": [
+        {
+          "tool": "uploaded_documents",
+          "confidence": 0.91,
+          "success_rate": 100.0,
+          "avg_cost": 0.005,
+          "avg_recovery_cost": 0.0
+        },
+        {
+          "tool": "web_search",
+          "confidence": 0.33,
+          "success_rate": 0.0,
+          "avg_cost": 0.12,
+          "avg_recovery_cost": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "id": 9,
+    "timestamp": "2026-06-09T20:27:14.314169",
+    "type": "routing",
+    "title": "Routing Decision",
+    "description": "Routed query to 'uploaded_documents' (Confidence: 0.91)",
+    "metrics": {
+      "mode": "exploit",
+      "options": [
+        {
+          "tool": "uploaded_documents",
+          "confidence": 0.91,
+          "success_rate": 100.0,
+          "avg_cost": 0.005,
+          "avg_recovery_cost": 0.0
+        },
+        {
+          "tool": "web_search",
+          "confidence": 0.33,
+          "success_rate": 0.0,
+          "avg_cost": 0.12,
+          "avg_recovery_cost": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "id": 10,
+    "timestamp": "2026-06-09T20:27:17.193308",
+    "type": "system",
+    "title": "Execution Complete",
+    "description": "Query executed via 'uploaded_documents' in 2.87s",
+    "metrics": {
+      "latency": 2.873131036758423,
+      "cost": 0.005,
+      "recovery_cost": 0.0,
+      "success": true
+    }
+  },
+  {
+    "id": 11,
+    "timestamp": "2026-06-09T20:27:30.087302",
+    "type": "routing",
+    "title": "Routing Decision",
+    "description": "Routed query to 'uploaded_documents' (Confidence: 0.91)",
+    "metrics": {
+      "mode": "exploit",
+      "options": [
+        {
+          "tool": "uploaded_documents",
+          "confidence": 0.91,
+          "success_rate": 100.0,
+          "avg_cost": 0.005,
+          "avg_recovery_cost": 0.0
+        },
+        {
+          "tool": "web_search",
+          "confidence": 0.33,
+          "success_rate": 0.0,
+          "avg_cost": 0.12,
+          "avg_recovery_cost": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "id": 12,
+    "timestamp": "2026-06-09T20:27:54.529368",
+    "type": "routing",
+    "title": "Routing Decision",
+    "description": "Routed query to 'uploaded_documents' (Confidence: 0.91)",
+    "metrics": {
+      "mode": "exploit",
+      "options": [
+        {
+          "tool": "uploaded_documents",
+          "confidence": 0.91,
+          "success_rate": 100.0,
+          "avg_cost": 0.005,
+          "avg_recovery_cost": 0.0
+        },
+        {
+          "tool": "web_search",
+          "confidence": 0.33,
+          "success_rate": 0.0,
+          "avg_cost": 0.12,
+          "avg_recovery_cost": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "id": 13,
+    "timestamp": "2026-06-09T20:27:58.045901",
+    "type": "system",
+    "title": "Execution Complete",
+    "description": "Query executed via 'uploaded_documents' in 3.51s",
+    "metrics": {
+      "latency": 3.5109312534332275,
       "cost": 0.005,
       "recovery_cost": 0.0,
       "success": true

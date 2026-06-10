@@ -1,10 +1,12 @@
 # TracePilot
 
+> **Note for Judges (Hosted Project):** Local-first architecture to protect enterprise data—requires local execution to view the Arize Phoenix telemetry dashboard. Please follow the instructions below to run locally.
+
 TracePilot is an autonomous FinOps routing agent that learns from operational observability data. Built for the Arize AI track of the Google Cloud Rapid Agent Hackathon.
 
 ## Features
 - **Economic Memory Engine**: Learns which tools and routes perform best based on cost, latency, and success rates.
-- **Phoenix MCP Auditor**: Continuously audits telemetry data to discover inefficiencies and update routing confidence.
+- **Phoenix MCP Auditor**: Continuously audits telemetry data via the Phoenix SDK to discover inefficiencies and update routing confidence.
 - **Mock Google Auth**: Realistic demo-ready UI.
 
 ## Getting Started
@@ -16,9 +18,15 @@ TracePilot is an autonomous FinOps routing agent that learns from operational ob
    pip install -r requirements.txt
    ```
 
-2. Run the demo server:
+2. Start the Arize Phoenix telemetry server in the background:
    ```bash
-   uvicorn tracepilot.api:app --host 0.0.0.0 --port 5000
+   python -m phoenix.server.main serve
+   ```
+   *(The server will run at http://localhost:6006)*
+
+3. Run the TracePilot demo server:
+   ```bash
+   uvicorn tracepilot.api:app --host 0.0.0.0 --port 5000 --reload
    ```
 
-3. Open `http://localhost:5000` in your browser.
+4. Open `http://localhost:5000` in your browser.
