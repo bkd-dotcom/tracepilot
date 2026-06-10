@@ -224,7 +224,8 @@ def get_traces():
         
         # Temporarily use base URL so Client can fetch correctly without v1/traces appending
         os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com/s/tracepilot"
-        client = Client()
+        import httpx
+        client = Client(http_client=httpx.Client(timeout=30.0))
         
         # Restore for any subsequent OTLP exports
         os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com/s/tracepilot/v1/traces"

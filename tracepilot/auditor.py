@@ -76,7 +76,7 @@ Output ONLY the JSON and nothing else.
                         result_text += p.text
     except Exception as e:
         console.print(f"[red]Error running MCP Agent: {e}[/red]")
-        return 0
+        raise e
 
     # Parse JSON output
     corrections_made = 0
