@@ -46,8 +46,17 @@ def web_search(query: str) -> dict:
     
     # Force a failure if it's an internal company query
     internal_keywords = ['handbook', 'pto', 'employee', 'policy']
+    
+    # Also block anything that matches uploaded documents so the system learns to route to them
+    try:
+        docs = _load_uploaded_docs()
+        for doc in docs:
+            internal_keywords.extend([kw.lower() for kw in doc.get("keywords", [])])
+    except Exception:
+        pass
+        
     if any(word in query.lower() for word in internal_keywords):
-        return {"status": "error", "message": "Access Denied: Internal data not found on public web."}
+        return {"status": "error", "source": "web_search", "error": "Access Denied: Internal data not found on public web."}
     
     # Generic success for public queries
     return {"status": "success", "data": f"Simulated web results for: {query}"}

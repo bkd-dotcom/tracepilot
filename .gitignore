@@ -36,6 +36,10 @@ MANIFEST
 *.db
 tracepilot_memory.db
 
+# Dynamic Data
+data/timeline.json
+data/uploaded_docs.json
+
 # OS generated files
 .DS_Store
 .DS_Store?
@@ -44,3 +48,4 @@ tracepilot_memory.db
 .Trashes
 ehthumbs.db
 Thumbs.db
+*.log

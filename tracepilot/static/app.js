@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false } // Minimalist - no legend
+                legend: { display: true, labels: { usePointStyle: true, pointStyle: 'circle', padding: 16, font: { family: 'Inter', size: 12 }, color: '#6B665E' } }
             },
             scales: {
                 x: {
@@ -304,8 +304,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function sendQuery(query) {
-        promptChips.forEach(c => c.disabled = true);
         addMessage("Executing query through ADK Orchestrator...", 'system');
+        const sendBtn = document.getElementById('btn-send');
+        sendBtn.disabled = true;
+        sendBtn.textContent = '⏳';
+        promptChips.forEach(c => c.disabled = true);
 
         try {
             const res = await fetch('/api/query', {
@@ -354,6 +357,9 @@ document.addEventListener('DOMContentLoaded', () => {
             addMessage(`Error connecting to orchestrator.`, 'system');
         } finally {
             promptChips.forEach(c => c.disabled = false);
+            const sendBtn = document.getElementById('btn-send');
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Send';
         }
     }
 

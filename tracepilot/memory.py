@@ -7,7 +7,7 @@ from typing import List, Dict, Any
 from tracepilot.config import (
     W_SUCCESS, W_COST, W_LATENCY, W_RECOVERY,
     MAX_EXPECTED_COST, MAX_EXPECTED_LATENCY,
-    EXPLOIT_THRESHOLD, DEFAULT_TOOL
+    EXPLOIT_THRESHOLD, DEFAULT_TOOL, MODEL_NAME
 )
 
 
@@ -107,7 +107,7 @@ def _recalculate_all(db_path: str = "tracepilot_memory.db") -> None:
 def record_run(task_category: str, tool_name: str, success: bool, cost: float, latency: float, recovery_cost: float = 0.0, db_path: str = "tracepilot_memory.db") -> None:
     """Insert or update a row."""
     # For MVP we only use gemini-2.5-flash
-    model_name = "gemini-2.5-flash"
+    model_name = MODEL_NAME
     
     with get_db(db_path) as conn:
         cursor = conn.cursor()
@@ -173,11 +173,20 @@ def get_optimal_routing(task_category: str, db_path: str = "tracepilot_memory.db
         selected_tool = best_option['tool_name']
     else:
         mode = "explore"
-        # Pick the alternate tool to explore. Prefer uploaded_documents if we were using web_search
-        if best_option['tool_name'] == "web_search":
-            selected_tool = "uploaded_documents"
+        # Cycle through all available tools to ensure we explore everything
+        all_possible_tools = ["web_search", "uploaded_documents", "internal_kb"]
+        # Find tools we haven't tried yet, or pick the one with the fewest runs
+        tried_tools = {r['tool_name']: r['total_runs'] for r in rows}
+        
+        # Tools not in DB have 0 runs
+        untried = [t for t in all_possible_tools if t not in tried_tools]
+        if untried:
+            selected_tool = untried[0]
         else:
-            selected_tool = "web_search"
+            # If all tried, pick the one that ISN'T the currently failing best_option
+            # Just rotate: internal_kb -> web_search -> uploaded_documents -> internal_kb
+            idx = all_possible_tools.index(best_option['tool_name'])
+            selected_tool = all_possible_tools[(idx + 1) % len(all_possible_tools)]
 
     return {
         "tool": selected_tool,
@@ -228,7 +237,7 @@ def get_confidence_table(db_path: str = "tracepilot_memory.db") -> List[Dict[str
 
 def update_confidence_from_audit(task_category: str, tool_name: str, new_confidence: float, db_path: str = "tracepilot_memory.db") -> None:
     """Direct confidence update from the auditor."""
-    model_name = "gemini-2.5-flash"
+    model_name = MODEL_NAME
     with get_db(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute('''

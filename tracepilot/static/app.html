@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TracePilot | Telemetry-Driven Routing</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
     <link rel="stylesheet" href="/static/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -90,11 +91,12 @@
             <div class="demo-controls">
                 <button id="btn-admin" class="btn outline">View Knowledge Base</button>
                 <button id="btn-upload" class="btn magic highlight">Upload Document</button>
-                <button id="btn-reset-system" style="background: none; border: none; font-size: 0.95rem; font-family: var(--font-body); color: var(--text-secondary); cursor: pointer; margin-left: 0.5rem;" title="Reset System">Reset</button>
-                <button id="btn-theme-toggle" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; margin-left: 0.5rem; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;" title="Toggle Dark Theme">
+                <button id="btn-reset-system" class="btn-text" title="Reset System">Reset</button>
+                <span class="header-divider"></span>
+                <button id="btn-theme-toggle" class="btn-icon" title="Toggle Dark Theme">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9.01 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
-                <button id="btn-logout" style="background: none; border: none; font-size: 0.95rem; font-family: var(--font-body); color: var(--text-secondary); cursor: pointer; margin-left: 0.5rem;" title="Logout">Logout</button>
+                <button id="btn-logout" class="btn-text" title="Logout">Logout</button>
             </div>
         </header>
 
@@ -122,6 +124,9 @@
                         </button>
                         <button class="chip" data-query="Find employee handbook section 8.1" style="background: transparent; border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.8rem; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; transition: background 0.2s;">
                             🔍 Find employee handbook section 8.1
+                        </button>
+                        <button class="chip" data-query="What is Python programming language?" style="background: transparent; border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.8rem; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; transition: background 0.2s;">
+                            🌐 What is Python?
                         </button>
                     </div>
                 </div>

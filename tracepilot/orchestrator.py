@@ -25,11 +25,6 @@ TOOL_MAP = {
     "uploaded_documents": uploaded_documents_search
 }
 
-# Map tool names to alternate tools (for fallback)
-FALLBACK_MAP = {
-    "internal_kb": "web_search",
-    "web_search": "internal_kb",
-}
 
 
 def classify_query(query: str) -> str:
@@ -58,7 +53,7 @@ def _create_agent(tool_func) -> Agent:
             "You are TracePilot, an enterprise assistant. "
             "Use the provided tool to answer the user's question. "
             "Always call the tool first before responding. "
-            "If the tool returns an error, you MUST include the exact text 'TOOL_ERROR' somewhere in your response."
+            "If the tool returns an error, you MUST start your response with exactly the word 'TOOL_ERROR'."
         ),
         tools=[tool_func],
     )
@@ -87,8 +82,8 @@ async def _run_agent(agent: Agent, query: str) -> tuple[str, bool]:
         if event.is_final_response() and event.content and event.content.parts:
             result_text = event.content.parts[0].text or ""
     
-    # Determine success: if the tool returned an error, the agent was instructed to output TOOL_ERROR
-    success = bool(result_text) and "TOOL_ERROR" not in result_text
+    # Determine success: robust check for tool failures
+    success = bool(result_text) and not any(err in result_text for err in ["TOOL_ERROR", "Access Denied", "No matching document"])
     return result_text, success
 
 
@@ -126,7 +121,13 @@ async def run_query(query: str, db_path: str = "tracepilot_memory.db") -> str:
     try:
         result_text, success = await _run_agent(agent, query)
     except Exception as e:
-        result_text = f"CRITICAL API ERROR: The Gemini API request failed ({e}). Please ensure your GEMINI_API_KEY is valid and has permissions."
+        error_str = str(e)
+        if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+            result_text = "⚠️ API rate limit reached. The Gemini free tier allows 20 requests/day. Please wait and try again. TOOL_ERROR"
+        elif "403" in error_str or "PERMISSION_DENIED" in error_str:
+            result_text = "⚠️ API key permission denied. Please check your GEMINI_API_KEY configuration. TOOL_ERROR"
+        else:
+            result_text = f"⚠️ Agent execution failed: {type(e).__name__}. TOOL_ERROR"
         success = False
         
     primary_latency = time.time() - start_time
@@ -134,7 +135,6 @@ async def run_query(query: str, db_path: str = "tracepilot_memory.db") -> str:
     
     recovery_cost = 0.0
     final_tool = selected_tool
-    fallback_used = False
     
     # Step 5: Record the result (No fallback per user request)
     record_run(category, selected_tool, success, primary_cost, primary_latency, 0.0, db_path)

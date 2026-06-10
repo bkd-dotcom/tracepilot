@@ -92,6 +92,60 @@ body {
     background: var(--bg-secondary);
 }
 
+.demo-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    font-size: 0.95rem;
+    font-family: var(--font-body);
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--border-radius-btn);
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-text:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--border-radius-btn);
+    transition: background 0.2s ease, color 0.2s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+.btn-icon:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.btn-icon.rotating {
+    transform: rotate(90deg) scale(0.5);
+    opacity: 0;
+}
+
+.header-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+    margin: 0 0.25rem;
+}
+
 .logo {
     display: flex;
     align-items: center;
@@ -581,12 +635,4 @@ input[type="text"]:focus, textarea:focus {
     background: var(--bg-hover) !important;
 }
 
-/* Theme Toggle Smooth Transition */
-#btn-theme-toggle {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-}
 
-#btn-theme-toggle.rotating {
-    transform: rotate(90deg) scale(0.5);
-    opacity: 0;
-}

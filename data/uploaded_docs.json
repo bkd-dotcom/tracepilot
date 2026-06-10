@@ -1,1 +1,35 @@
-[]
+[
+  {
+    "title": "employee",
+    "content": "Employee handbook section 7.3 covers the official company dress code. All employees must wear business casual.",
+    "keywords": [
+      "employee",
+      "handbook",
+      "section",
+      "covers",
+      "the"
+    ]
+  },
+  {
+    "title": "python notebook",
+    "content": "Python is a versatile, high-level programming language. Famous for its simple, readable syntax that resembles everyday English, it is widely used for web development, data analysis, artificial intelligence (AI), and automating repetitive tasks. It is one of the most popular and beginner-friendly languages globally.",
+    "keywords": [
+      "python",
+      "for",
+      "and",
+      "notebook",
+      "versatile"
+    ]
+  },
+  {
+    "title": "python",
+    "content": "Python programming language is high level and versatile. Famous for its simple, readable syntax that resembles everyday English, it is widely used for web development, data analysis, artificial intelligence (AI), and automating repetitive tasks. It is one of the most popular and beginner-friendly languages globally.",
+    "keywords": [
+      "and",
+      "python",
+      "for",
+      "programming",
+      "language"
+    ]
+  }
+]

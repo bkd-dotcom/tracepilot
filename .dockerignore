@@ -1,0 +1,38 @@
+# Version control
+.git/
+.gitignore
+
+# Python environments
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment files with secrets
+.env
+.env.save
+.env.example
+
+# Databases (must not bake local state into image)
+*.db
+*.sqlite3
+
+# Dynamic data files (created at runtime)
+data/timeline.json
+data/uploaded_docs.json
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Gemini artifacts
+.gemini/

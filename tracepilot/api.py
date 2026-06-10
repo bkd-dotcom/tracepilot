@@ -176,12 +176,12 @@ def get_documents():
 
 @app.get("/api/traces")
 def get_traces():
-    from tracepilot.config import PROJECT_NAME
+    from tracepilot.config import PROJECT_NAME, PHOENIX_ENDPOINT
     from tracepilot.memory import get_last_reset_time
     import pandas as pd
     try:
         from phoenix.client import Client
-        client = Client()
+        client = Client(base_url=PHOENIX_ENDPOINT)
         df = client.spans.get_spans_dataframe(project_name=PROJECT_NAME)
         if df is None or df.empty:
             return {"status": "success", "data": []}
@@ -198,11 +198,19 @@ def get_traces():
         for r in recent:
             output_val = str(r.get("attributes.output.value", ""))
             status = "Error" if '"status": "error"' in output_val or "'status': 'error'" in output_val else "Success"
+            
+            # Calculate latency from timestamps
+            start_t = r.get("start_time")
+            end_t = r.get("end_time")
+            latency_sec = 0.0
+            if pd.notnull(start_t) and pd.notnull(end_t):
+                latency_sec = (end_t - start_t).total_seconds()
+                
             clean_data.append({
                 "name": str(r.get("name", "Unknown")).replace("execute_tool ", ""),
                 "status": status,
-                "latency": round(r.get("latency_ms", 0) / 1000, 3) if "latency_ms" in r else 0,
-                "time": str(r.get("start_time", ""))[:19]
+                "latency": round(latency_sec, 3),
+                "time": str(start_t)[:19] if pd.notnull(start_t) else ""
             })
         
         return {"status": "success", "data": clean_data[::-1]}

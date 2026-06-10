@@ -18,7 +18,7 @@ def run_audit(db_path: str = "tracepilot_memory.db") -> None:
     before = get_confidence_table(db_path)
     
     try:
-        client = Client()
+        client = Client(base_url=PHOENIX_ENDPOINT)
         # Query spans from the tracepilot project
         spans_df = client.spans.get_spans_dataframe(
             project_name=PROJECT_NAME,
