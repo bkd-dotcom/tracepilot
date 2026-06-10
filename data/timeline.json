@@ -233,5 +233,16 @@
       "recovery_cost": 0.0,
       "success": true
     }
+  },
+  {
+    "id": 14,
+    "timestamp": "2026-06-09T21:45:37.572989",
+    "type": "routing",
+    "title": "Routing Decision",
+    "description": "Routed query to 'web_search' (Confidence: 0.50)",
+    "metrics": {
+      "mode": "explore",
+      "options": []
+    }
   }
 ]

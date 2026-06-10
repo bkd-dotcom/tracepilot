@@ -8,6 +8,10 @@ import os
 from tracepilot.orchestrator import run_query
 from tracepilot.auditor import run_audit
 from tracepilot.memory import get_confidence_table, reset_db
+from tracepilot.tracing import init_tracing
+
+# Initialize tracing globally once when the FastAPI server starts
+init_tracing()
 
 app = FastAPI(title="TracePilot API")
 
@@ -83,31 +87,29 @@ def get_timeline():
     from tracepilot.events import get_events
     return get_events()
 
-def _run_isolated_query(q: str):
+def _run_threaded_query(q: str):
     import asyncio
     from dotenv import load_dotenv
     load_dotenv()
-    
-    # Initialize tracing in the child process
-    from tracepilot.tracing import init_tracing
-    tracer_provider = init_tracing()
     
     from tracepilot.orchestrator import run_query
     result = asyncio.run(run_query(q))
     
     # Force flush so traces are immediately available in Phoenix
-    if hasattr(tracer_provider, 'force_flush'):
-        tracer_provider.force_flush()
+    from opentelemetry import trace
+    provider = trace.get_tracer_provider()
+    if hasattr(provider, 'force_flush'):
+        provider.force_flush()
         
     return result
 
 @app.post("/api/query")
 def handle_query(request: QueryRequest):
-    from concurrent.futures import ProcessPoolExecutor
+    from concurrent.futures import ThreadPoolExecutor
     try:
-        # Run in a completely isolated process to avoid Google ADK / httpx async conflicts
-        with ProcessPoolExecutor(max_workers=1) as executor:
-            future = executor.submit(_run_isolated_query, request.query)
+        # Run in a separate thread to avoid Google ADK / httpx async conflicts without process overhead
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(_run_threaded_query, request.query)
             result = future.result()
         return {"status": "success", "response": result}
     except Exception as e:
