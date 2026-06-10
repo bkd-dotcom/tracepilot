@@ -42,7 +42,10 @@ def run_audit(db_path: str = "tracepilot_memory.db") -> None:
         
         # Analyze spans for insights
         # Look for TOOL spans and their success/failure
-        tool_spans = spans_df[spans_df.get("span_kind", "") == "TOOL"] if "span_kind" in spans_df.columns else spans_df
+        if "attributes.tool.name" in spans_df.columns:
+            tool_spans = spans_df[spans_df["attributes.tool.name"].notnull()]
+        else:
+            tool_spans = spans_df[spans_df.get("span_kind", "") == "TOOL"] if "span_kind" in spans_df.columns else spans_df
         
         console.print(f"[dim]Analyzed {len(tool_spans)} tool spans[/dim]")
         
@@ -52,7 +55,10 @@ def run_audit(db_path: str = "tracepilot_memory.db") -> None:
         if "attributes.output.value" in tool_spans.columns:
             for idx, row in tool_spans.iterrows():
                 output = str(row.get("attributes.output.value", ""))
-                tool_name = str(row.get("name", "")).replace("execute_tool ", "")
+                
+                tool_name = str(row.get("attributes.tool.name", ""))
+                if not tool_name:
+                    tool_name = str(row.get("name", "")).replace("execute_tool ", "")
                 
                 if '"status": "error"' in output or '"status":"error"' in output or "'status': 'error'" in output or "'status':'error'" in output:
                     # We found a tool error that the agent might have hallucinated as a success!

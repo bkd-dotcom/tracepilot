@@ -191,13 +191,22 @@ def get_traces():
         last_reset_dt = pd.to_datetime(last_reset, utc=True)
         df = df[df['start_time'] >= last_reset_dt]
         
-        tool_spans = df[df.get("span_kind", "") == "TOOL"] if "span_kind" in df.columns else df
+        if "attributes.tool.name" in df.columns:
+            tool_spans = df[df["attributes.tool.name"].notnull()]
+        else:
+            tool_spans = df[df.get("span_kind", "") == "TOOL"] if "span_kind" in df.columns else df
+            
         recent = tool_spans.tail(15).fillna("").to_dict(orient="records")
         
         clean_data = []
         for r in recent:
             output_val = str(r.get("attributes.output.value", ""))
             status = "Error" if '"status": "error"' in output_val or "'status': 'error'" in output_val else "Success"
+            
+            tool_name = str(r.get("attributes.tool.name", ""))
+            if not tool_name:
+                tool_name = str(r.get("name", "Unknown")).replace("execute_tool ", "")
+
             
             # Calculate latency from timestamps
             start_t = r.get("start_time")
@@ -207,7 +216,7 @@ def get_traces():
                 latency_sec = (end_t - start_t).total_seconds()
                 
             clean_data.append({
-                "name": str(r.get("name", "Unknown")).replace("execute_tool ", ""),
+                "name": tool_name,
                 "status": status,
                 "latency": round(latency_sec, 3),
                 "time": str(start_t)[:19] if pd.notnull(start_t) else ""

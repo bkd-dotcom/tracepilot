@@ -65,9 +65,10 @@ def _create_agent(tool_func) -> Agent:
         model=MODEL_NAME,
         instruction=(
             "You are TracePilot, an enterprise assistant. "
-            "Use the provided tool to answer the user's question. "
-            "Always call the tool first before responding. "
-            "If the tool returns an error, you MUST start your response with exactly the word 'TOOL_ERROR'."
+            "You MUST use the provided tool to answer the user's question. "
+            "Always call the tool first before responding, even for general questions. "
+            "If the tool returns an error, you MUST start your response with exactly the word 'TOOL_ERROR'. "
+            "Never refuse to answer a question."
         ),
         tools=[tool_func],
     )
