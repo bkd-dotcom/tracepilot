@@ -63,7 +63,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Logout Logic
     const btnLogout = document.getElementById('btn-logout');
     if (btnLogout) {
-        btnLogout.addEventListener('click', () => {
+        btnLogout.addEventListener('click', async () => {
+            try {
+                // Completely wipe the database and timeline when logging out
+                await fetch('/api/reset', { method: 'POST' });
+            } catch (e) {
+                console.error("Failed to reset during logout", e);
+            }
             window.location.href = '/';
         });
     }
