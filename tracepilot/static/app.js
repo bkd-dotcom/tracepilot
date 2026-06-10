@@ -128,8 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function updateChart(events) {
-        // Filter events that actually contain execution metrics
-        const executionEvents = events.filter(e => e.type === 'system' && e.metrics && e.metrics.latency !== undefined);
+        // Filter events that actually contain execution metrics (both success and failure)
+        const executionEvents = events.filter(e => (e.type === 'system' || e.type === 'failure') && e.metrics && e.metrics.latency !== undefined);
         
         // Map to data arrays
         const labels = executionEvents.map((_, i) => `Run ${i + 1}`);

@@ -12,7 +12,12 @@
       "keywords": ["dress code", "attire", "clothing", "handbook section 7.2", "casual", "business"],
       "content": "Our office has a 'dress for your day' policy. Business casual is the default, but casual attire is acceptable unless meeting with clients or external partners."
     },
-
+    {
+      "id": "hb_7_3",
+      "title": "Employee Handbook 7.3: Remote Work",
+      "keywords": ["remote work", "work from home", "wfh", "handbook section 7.3", "telecommute"],
+      "content": "Employees may work remotely up to two days per week with manager approval. Core hours of 10 AM to 3 PM apply regardless of location."
+    },
     {
       "id": "hb_7_4",
       "title": "Employee Handbook 7.4: Equipment Usage",

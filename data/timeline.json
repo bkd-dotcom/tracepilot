@@ -244,5 +244,16 @@
       "mode": "explore",
       "options": []
     }
+  },
+  {
+    "id": 15,
+    "timestamp": "2026-06-09T21:55:30.315005",
+    "type": "system",
+    "title": "title",
+    "description": "desc",
+    "metrics": {
+      "latency": 1.0,
+      "cost": 0.1
+    }
   }
 ]
