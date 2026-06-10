@@ -52,8 +52,15 @@ def handle_upload(request: UploadRequest):
         stop_words = {"this", "that", "with", "from", "your", "have", "they", "will", "would", "what", "when", "where", "which"}
         words = [w for w in words if w not in stop_words]
         
-        # Get top 5 keywords, but ensure the title itself is heavily prioritized if it's a single word
+        # Get top 5 keywords
         common_words = [word for word, count in Counter(words).most_common(5)]
+        
+        # Ensure filename base words are ALWAYS included as keywords
+        base_name = request.filename.lower().split('.')[0]
+        base_words = re.findall(r'\b[a-zA-Z0-9]{3,}\b', base_name)
+        for bw in base_words:
+            if bw not in common_words and bw not in stop_words:
+                common_words.insert(0, bw)
         
         doc = {
             "title": request.filename,
