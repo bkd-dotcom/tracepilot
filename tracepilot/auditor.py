@@ -19,9 +19,13 @@ def run_audit(db_path: str = "tracepilot_memory.db") -> None:
     
     try:
         import os
-        os.environ["PHOENIX_API_KEY"] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6NCJ9.Kw9QTuiZisT-fI7Z9QRXpomv9p37mw_jDrJ-1lMUvlc"
-        os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com/s/tracepilot"
-        client = Client()
+        os.environ["PHOENIX_API_KEY"] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.bw5w46vTPfXxGuTqGjyj3gsUG2MsnZhVN07m70HI0WQ"
+        os.environ["PHOENIX_CLIENT_HEADERS"] = "api_key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.bw5w46vTPfXxGuTqGjyj3gsUG2MsnZhVN07m70HI0WQ"
+        
+        # OTLP needs /v1/traces, but Client needs the base workspace URL
+        os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com/s/tracepilot/v1/traces"
+        client = Client(endpoint="https://app.phoenix.arize.com/s/tracepilot")
+        
         # Query spans from the tracepilot project
         spans_df = client.spans.get_spans_dataframe(
             project_name=PROJECT_NAME,
