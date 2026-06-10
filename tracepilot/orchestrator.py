@@ -123,7 +123,12 @@ async def run_query(query: str, db_path: str = "tracepilot_memory.db") -> str:
     agent = _create_agent(tool_func)
     
     start_time = time.time()
-    result_text, success = await _run_agent(agent, query)
+    try:
+        result_text, success = await _run_agent(agent, query)
+    except Exception as e:
+        result_text = f"CRITICAL API ERROR: The Gemini API request failed ({e}). Please ensure your GEMINI_API_KEY is valid and has permissions."
+        success = False
+        
     primary_latency = time.time() - start_time
     primary_cost = TOOL_COSTS[selected_tool]
     
