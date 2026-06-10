@@ -14,8 +14,18 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# HuggingFace requires running as non-root user 1000
+RUN useradd -m -u 1000 user
+
+# Create directories for Phoenix and DB, and give permissions to user
+RUN mkdir -p /app /home/user/.phoenix && chown -R user:user /app /home/user
+
 # Copy application code
-COPY . .
+COPY --chown=user:user . /app
+
+# Switch to the non-root user
+USER user
+ENV PATH="/home/user/.local/bin:$PATH"
 
 # Set environment variables for HuggingFace Spaces
 # Spaces uses port 7860 by default
