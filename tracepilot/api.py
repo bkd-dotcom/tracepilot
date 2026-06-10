@@ -129,12 +129,40 @@ def handle_query(request: QueryRequest):
 @app.post("/api/audit")
 async def handle_audit():
     try:
-        # Calls your existing Phoenix telemetry scraper
-        run_audit()
-        # Fetch updated memory
-        table_data = get_confidence_table()
-        return {"status": "success", "message": "Audit complete. Memory updated.", "data": table_data}
+        from tracepilot.auditor import async_run_audit
+        from tracepilot.memory import get_confidence_table, _recalculate_all
+        from rich.console import Console
+        from tracepilot.display import print_audit_summary, print_confidence_table
+        from tracepilot.events import emit_event
+        
+        console = Console()
+        db_path = "tracepilot_memory.db"
+        before = get_confidence_table(db_path)
+        
+        corrections_made = await async_run_audit(db_path)
+        
+        if corrections_made > 0:
+            console.print(f"[yellow]⚠️ MCP Audit found {corrections_made} hidden tool failures! Correcting memory...[/yellow]")
+            emit_event(
+                type="learning",
+                title="Memory Correction",
+                description=f"MCP Auditor Agent found {corrections_made} hidden LLM failure(s). Confidence scores recalculated.",
+                metrics={"corrections": corrections_made}
+            )
+        else:
+            console.print("[green]✅ MCP Audit complete. No new hidden tool failures found.[/green]")
+            
+        console.print("[dim]Recalculating confidence scores from run history...[/dim]\n")
+        _recalculate_all(db_path)
+        after = get_confidence_table(db_path)
+        print_audit_summary(before, after)
+        console.print("\n[bold]Current Economic Memory:[/bold]")
+        print_confidence_table(after)
+        
+        return {"status": "success", "message": "Audit complete. Memory updated.", "data": after}
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/memory")

@@ -1,106 +1,131 @@
-"""TracePilot Auditor — queries Phoenix traces and updates Economic Memory."""
+"""TracePilot Auditor — ADK Agent using Arize Phoenix MCP to evaluate traces."""
 
-from phoenix.client import Client
-from tracepilot.config import PHOENIX_ENDPOINT, PROJECT_NAME, TOOL_COSTS
+import asyncio
+import json
+import os
+from google.adk.agents.llm_agent import LlmAgent
+from google.adk.tools.mcp_tool import McpToolset
+from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams
+from google.adk.runners import InMemoryRunner
+from google.genai import types
+
+from tracepilot.config import MODEL_NAME
 from tracepilot.memory import get_confidence_table, update_confidence_from_audit, _recalculate_all, get_db
 from tracepilot.display import print_confidence_table, print_audit_summary
 
-
-def run_audit(db_path: str = "tracepilot_memory.db") -> None:
-    """Query Phoenix traces and update Economic Memory confidence scores."""
+async def async_run_audit(db_path: str = "tracepilot_memory.db"):
     from rich.console import Console
     console = Console()
     
-    console.print("\n[bold cyan]═══ TracePilot Auditor ═══[/bold cyan]")
-    console.print("[dim]Querying Phoenix for trace data...[/dim]\n")
+    console.print("\n[bold cyan]═══ TracePilot MCP Auditor ═══[/bold cyan]")
+    console.print("[dim]Spinning up Auditor Agent with Arize Phoenix MCP...[/dim]\n")
     
-    # Get before state
+    from mcp.client.stdio import StdioServerParameters
+    
+    mcp_toolset = McpToolset(
+        connection_params=StdioConnectionParams(
+            server_params=StdioServerParameters(
+                command="npx",
+                args=[
+                    "-y", 
+                    "@arizeai/phoenix-mcp@latest", 
+                    "--baseUrl", "https://app.phoenix.arize.com/s/tracepilot",
+                    "--apiKey", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.bw5w46vTPfXxGuTqGjyj3gsUG2MsnZhVN07m70HI0WQ"
+                ]
+            )
+        ),
+    )
+    
+    # 2. Instantiate the Auditor Agent
+    auditor_agent = LlmAgent(
+        model=MODEL_NAME,
+        name="phoenix_auditor",
+        instruction="""
+You are the TracePilot Auditor Agent. Your job is to use the Phoenix MCP server to query recent traces.
+Call your tool to fetch traces. 
+Analyze the traces for any tool span where the output contains the word 'error' or 'Access Denied'.
+If you find a failing tool, you must penalize it by outputting a JSON object exactly like this:
+```json
+{
+    "penalties": [
+        {"tool_name": "internal_kb", "reason": "Access denied error"}
+    ]
+}
+```
+If there are no errors, output {"penalties": []}.
+Output ONLY the JSON and nothing else.
+""",
+        tools=[mcp_toolset]
+    )
+
+    runner = InMemoryRunner(agent=auditor_agent, app_name="auditor")
+    session = await runner.session_service.create_session(state={}, app_name="auditor", user_id="admin")
+    
+    result_text = ""
+    console.print("[dim]Auditor Agent is querying Phoenix via MCP...[/dim]")
+    try:
+        async for event in runner.run_async(
+            user_id="admin",
+            session_id=session.id,
+            new_message=types.Content(
+                role="user",
+                parts=[types.Part(text="Fetch the traces. Find any tool failures. Return the JSON.")]
+            ),
+        ):
+            if event.is_final_response() and event.content and event.content.parts:
+                for p in event.content.parts:
+                    if p.text:
+                        result_text += p.text
+    except Exception as e:
+        console.print(f"[red]Error running MCP Agent: {e}[/red]")
+        return 0
+
+    # Parse JSON output
+    corrections_made = 0
+    try:
+        # Strip markdown code blocks if any
+        clean_text = result_text.replace("```json", "").replace("```", "").strip()
+        data = json.loads(clean_text)
+        
+        penalties = data.get("penalties", [])
+        for penalty in penalties:
+            tool_name = penalty.get("tool_name")
+            if tool_name:
+                with get_db(db_path) as conn:
+                    cursor = conn.cursor()
+                    cursor.execute('''
+                        UPDATE economic_memory 
+                        SET successful_runs = MAX(0, successful_runs - 1)
+                        WHERE tool_name = ?
+                    ''', (tool_name,))
+                corrections_made += 1
+    except Exception as e:
+        console.print(f"[yellow]Could not parse Auditor Agent JSON output: {e}[/yellow]\nOutput was: {result_text}")
+        
+    return corrections_made
+
+def run_audit(db_path: str = "tracepilot_memory.db") -> None:
+    """Query Phoenix traces via MCP Agent and update Economic Memory confidence scores."""
+    from rich.console import Console
+    console = Console()
+    
     before = get_confidence_table(db_path)
     
-    try:
-        import os
-        os.environ["PHOENIX_API_KEY"] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.bw5w46vTPfXxGuTqGjyj3gsUG2MsnZhVN07m70HI0WQ"
-        os.environ["PHOENIX_CLIENT_HEADERS"] = "api_key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.bw5w46vTPfXxGuTqGjyj3gsUG2MsnZhVN07m70HI0WQ"
-        
-        # Temporarily use base URL so Client can fetch correctly without v1/traces appending
-        os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com/s/tracepilot"
-        client = Client()
-        
-        # Restore for any subsequent OTLP exports
-        os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com/s/tracepilot/v1/traces"
-        
-        # Query spans from the tracepilot project
-        spans_df = client.spans.get_spans_dataframe(
-            project_name=PROJECT_NAME,
+    corrections_made = asyncio.run(async_run_audit(db_path))
+    
+    from tracepilot.events import emit_event
+    if corrections_made > 0:
+        console.print(f"[yellow]⚠️ MCP Audit found {corrections_made} hidden tool failures! Correcting memory...[/yellow]")
+        emit_event(
+            type="learning",
+            title="Memory Correction",
+            description=f"MCP Auditor Agent found {corrections_made} hidden LLM failure(s). Confidence scores recalculated.",
+            metrics={"corrections": corrections_made}
         )
+    else:
+        console.print("[green]✅ MCP Audit complete. No new hidden tool failures found.[/green]")
         
-        if spans_df is None or spans_df.empty:
-            console.print("[yellow]No traces found in Phoenix. Run some queries first.[/yellow]")
-            return
-            
-        from tracepilot.memory import get_last_reset_time
-        import pandas as pd
-        last_reset = get_last_reset_time()
-        spans_df['start_time'] = pd.to_datetime(spans_df['start_time'], utc=True)
-        spans_df = spans_df[spans_df['start_time'] >= pd.to_datetime(last_reset, utc=True)]
-        
-        if spans_df.empty:
-            console.print("[yellow]No new traces since last reset.[/yellow]")
-            return
-        
-        console.print(f"[green]Found {len(spans_df)} spans in Phoenix[/green]")
-        
-        # Analyze spans for insights
-        # Look for TOOL spans and their success/failure
-        if "attributes.tool.name" in spans_df.columns:
-            tool_spans = spans_df[spans_df["attributes.tool.name"].notnull()]
-        else:
-            tool_spans = spans_df[spans_df.get("span_kind", "") == "TOOL"] if "span_kind" in spans_df.columns else spans_df
-        
-        console.print(f"[dim]Analyzed {len(tool_spans)} tool spans[/dim]")
-        
-        # In a real app we'd map trace IDs to query IDs. For the demo, we just look at the last few tool runs.
-        # If a tool span output contains '"status": "error"', we force the confidence down.
-        corrections_made = 0
-        if "attributes.output.value" in tool_spans.columns:
-            for idx, row in tool_spans.iterrows():
-                output = str(row.get("attributes.output.value", ""))
-                
-                tool_name = str(row.get("attributes.tool.name", ""))
-                if not tool_name:
-                    tool_name = str(row.get("name", "")).replace("execute_tool ", "")
-                
-                if '"status": "error"' in output or '"status":"error"' in output or "'status': 'error'" in output or "'status':'error'" in output:
-                    # We found a tool error that the agent might have hallucinated as a success!
-                    # Penalize confidence
-                    # For demo purposes, we will hardcode the category deduction since we don't have trace linking
-                    category = "internal" if "employee" in output or "internal" in output else "public"
-                    
-                    # Update DB directly to mark a failure
-                    with get_db(db_path) as conn:
-                        cursor = conn.cursor()
-                        cursor.execute('''
-                            UPDATE economic_memory 
-                            SET successful_runs = MAX(0, successful_runs - 1)
-                            WHERE tool_name = ?
-                        ''', (tool_name,))
-                    corrections_made += 1
-                    
-        from tracepilot.events import emit_event
-        if corrections_made > 0:
-            console.print(f"[yellow]⚠️ Audit found {corrections_made} hidden tool failures! Correcting memory...[/yellow]")
-            emit_event(
-                type="learning",
-                title="Memory Correction",
-                description=f"Auditor found {corrections_made} hidden LLM failure(s). Confidence scores recalculated.",
-                metrics={"corrections": corrections_made}
-            )
-        
-        console.print("[dim]Recalculating confidence scores from run history...[/dim]\n")
-        
-    except Exception as e:
-        console.print(f"[yellow]Phoenix query returned: {e}[/yellow]")
-        console.print("[dim]Falling back to local Economic Memory data for audit...[/dim]\n")
+    console.print("[dim]Recalculating confidence scores from run history...[/dim]\n")
     
     # Recalculate all confidence scores from the recorded runs
     _recalculate_all(db_path)
