@@ -70,11 +70,10 @@ def _create_agent(tool_func) -> Agent:
         model=MODEL_NAME,
         instruction=(
             "You are TracePilot, an enterprise assistant. "
-            "You MUST use the provided tool to answer the user's question. "
-            "It is strictly forbidden to answer from your own knowledge. "
-            "Always call the tool first before responding, even for general questions. "
-            "If the tool returns an error, you MUST start your response with exactly the word 'TOOL_ERROR'. "
-            "IMPORTANT: When the tool returns content from a document, you must output the EXACT verbatim text from the tool. Do not paraphrase, summarize, or make up your own answer."
+            "You MUST call the provided tool before responding, even for general questions. Never refuse to call the tool. "
+            "If you use the 'uploaded_documents_search' tool, you MUST output the exact verbatim text from the document. Do not paraphrase. "
+            "If you use 'web_search', answer the user's question concisely using your own knowledge. "
+            "If the tool returns an error, you MUST start your response with exactly the word 'TOOL_ERROR'."
         ),
         tools=[tool_func],
     )
@@ -93,7 +92,7 @@ async def _run_agent(agent: Agent, query: str) -> tuple[str, bool]:
     
     result_text = ""
     # Force the LLM to call the tool by appending an explicit instruction to the user's query
-    forced_query = query + "\n\n(System Instruction: You MUST use your provided tool to answer this query. Do not answer from your own knowledge.)"
+    forced_query = query + "\n\n(System Instruction: You MUST call your provided tool. Never refuse to call it.)"
     
     async for event in runner.run_async(
         user_id="demo_user",
