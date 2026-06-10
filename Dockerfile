@@ -12,6 +12,9 @@ RUN apt-get update && apt-get install -y \
     npm \
     && rm -rf /var/lib/apt/lists/*
 
+# Pre-install Phoenix MCP server globally to drastically speed up Auditor Agent spin-up time
+RUN npm install -g @arizeai/phoenix-mcp@latest
+
 # Copy requirements and install
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

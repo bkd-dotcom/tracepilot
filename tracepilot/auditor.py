@@ -25,10 +25,8 @@ async def async_run_audit(db_path: str = "tracepilot_memory.db"):
     mcp_toolset = McpToolset(
         connection_params=StdioConnectionParams(
             server_params=StdioServerParameters(
-                command="npx",
+                command="phoenix-mcp",
                 args=[
-                    "-y", 
-                    "@arizeai/phoenix-mcp@latest", 
                     "--baseUrl", "https://app.phoenix.arize.com/s/tracepilot",
                     "--apiKey", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJBcGlLZXk6MSJ9.bw5w46vTPfXxGuTqGjyj3gsUG2MsnZhVN07m70HI0WQ"
                 ]
