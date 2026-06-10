@@ -27,6 +27,16 @@ def run_audit(db_path: str = "tracepilot_memory.db") -> None:
         if spans_df is None or spans_df.empty:
             console.print("[yellow]No traces found in Phoenix. Run some queries first.[/yellow]")
             return
+            
+        from tracepilot.memory import get_last_reset_time
+        import pandas as pd
+        last_reset = get_last_reset_time()
+        spans_df['start_time'] = pd.to_datetime(spans_df['start_time'], utc=True)
+        spans_df = spans_df[spans_df['start_time'] >= pd.to_datetime(last_reset, utc=True)]
+        
+        if spans_df.empty:
+            console.print("[yellow]No new traces since last reset.[/yellow]")
+            return
         
         console.print(f"[green]Found {len(spans_df)} spans in Phoenix[/green]")
         

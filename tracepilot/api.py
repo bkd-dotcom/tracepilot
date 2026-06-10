@@ -164,12 +164,19 @@ def get_documents():
 @app.get("/api/traces")
 def get_traces():
     from tracepilot.config import PROJECT_NAME
+    from tracepilot.memory import get_last_reset_time
+    import pandas as pd
     try:
         from phoenix.client import Client
         client = Client()
         df = client.spans.get_spans_dataframe(project_name=PROJECT_NAME)
         if df is None or df.empty:
             return {"status": "success", "data": []}
+            
+        last_reset = get_last_reset_time()
+        df['start_time'] = pd.to_datetime(df['start_time'], utc=True)
+        last_reset_dt = pd.to_datetime(last_reset, utc=True)
+        df = df[df['start_time'] >= last_reset_dt]
         
         tool_spans = df[df.get("span_kind", "") == "TOOL"] if "span_kind" in df.columns else df
         recent = tool_spans.tail(15).fillna("").to_dict(orient="records")

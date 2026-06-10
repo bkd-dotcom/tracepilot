@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "timestamp": "2026-06-09T20:11:38.724910",
+    "timestamp": "2026-06-09T20:18:09.936236",
     "type": "routing",
     "title": "Routing Decision",
     "description": "Routed query to 'web_search' (Confidence: 0.50)",
@@ -12,15 +12,25 @@
   },
   {
     "id": 2,
-    "timestamp": "2026-06-09T20:11:56.927423",
+    "timestamp": "2026-06-09T20:18:18.205542",
     "type": "system",
     "title": "Execution Complete",
-    "description": "Query executed via 'web_search \u2192 internal_kb' in 18.19s",
+    "description": "Query executed via 'web_search' in 8.26s",
     "metrics": {
-      "latency": 18.192461013793945,
-      "cost": 0.13,
-      "recovery_cost": 0.12,
+      "latency": 8.26410984992981,
+      "cost": 0.12,
+      "recovery_cost": 0.0,
       "success": true
+    }
+  },
+  {
+    "id": 3,
+    "timestamp": "2026-06-09T20:18:27.440245",
+    "type": "learning",
+    "title": "Memory Correction",
+    "description": "Auditor found 1 hidden LLM failure(s). Confidence scores recalculated.",
+    "metrics": {
+      "corrections": 1
     }
   }
 ]

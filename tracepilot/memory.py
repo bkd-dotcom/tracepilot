@@ -243,4 +243,21 @@ def reset_db(db_path: str = "tracepilot_memory.db") -> None:
     with get_db(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute('DROP TABLE IF EXISTS economic_memory')
+        cursor.execute('CREATE TABLE IF NOT EXISTS system_config (key TEXT PRIMARY KEY, value TEXT)')
+        import datetime
+        now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        cursor.execute('INSERT OR REPLACE INTO system_config (key, value) VALUES (?, ?)', ('last_reset', now_iso))
     init_db(db_path)
+
+def get_last_reset_time(db_path: str = "tracepilot_memory.db") -> str:
+    """Get the ISO timestamp of the last system reset."""
+    try:
+        with get_db(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT value FROM system_config WHERE key = ?', ('last_reset',))
+            row = cursor.fetchone()
+            if row:
+                return row[0]
+    except Exception:
+        pass
+    return "1970-01-01T00:00:00+00:00"

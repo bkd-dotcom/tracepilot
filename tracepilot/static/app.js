@@ -272,6 +272,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 addMessage(`⚠️ AUDIT COMPLETE: Phoenix trace analysis found hidden LLM tool failures. Correcting memory...`, 'system');
                 renderMemoryTable(data.data, true); // highlight changes
                 fetchTimeline(); // Force immediate timeline update
+                
+                setTimeout(async () => {
+                    const tracesModal = document.getElementById('traces-modal');
+                    if (tracesModal) tracesModal.classList.remove('hidden');
+                    await fetchTraces();
+                }, 1500);
             }
         } catch (e) {
             console.error(e);
