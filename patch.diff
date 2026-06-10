@@ -1,0 +1,46 @@
+--- tracepilot/orchestrator.py
++++ tracepilot/orchestrator.py
+@@ -140,8 +140,9 @@
+         return {"result_text": "ERROR: Tool explicitly denied.", "routing": routing, "metrics": {}}
+ 
+     tool_func = TOOL_MAP[selected_tool]
+-    agent = _create_agent(tool_func)
+     
++    print(f"[DEBUG] Executing run_query with query='{query}', selected_tool='{selected_tool}'")
++
+     # Force the LLM to call the tool by appending an explicit instruction to the user's query
+     forced_query = query + "\n\n(System Instruction: You MUST call your provided tool. Never refuse to call it.)"
+     
+@@ -149,15 +150,19 @@
+     if selected_tool in ["uploaded_documents", "internal_kb"]:
+         tool_result = tool_func(query)
+         if tool_result.get("status") == "success":
+             result_text = tool_result.get("content", "")
+             success = True
++            print(f"[DEBUG] Verbatim tool success. Output: {result_text[:50]}...")
+         else:
+             result_text = f"TOOL_ERROR: {tool_result.get('error', 'Unknown Error')}"
+             success = False
++            print(f"[DEBUG] Verbatim tool failure. Output: {result_text}")
+             
+         return {
+             "result_text": result_text,
+             "routing": routing,
+             "metrics": {
+                 "success": success,
+                 "cost": cost,
+@@ -165,10 +170,14 @@
+                 "recovery_cost": 0.0
+             }
+         }
+ 
+     # Otherwise use LLM
++    agent = _create_agent(tool_func)
+     start_time = time.time()
+     try:
++        print(f"[DEBUG] Calling ADK _run_agent with forced_query='{forced_query}'")
+         result_text, success = await _run_agent(agent, forced_query)
++        print(f"[DEBUG] ADK returned result_text='{result_text}', success={success}")
+     except Exception as e:
+         error_str = str(e)
+         if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
