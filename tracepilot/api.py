@@ -163,7 +163,7 @@ async def handle_audit():
     except Exception as e:
         import traceback
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=str(e))
+        return {"status": "error", "message": str(e)}
 
 @app.get("/api/memory")
 async def get_memory():

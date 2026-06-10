@@ -284,6 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (tracesModal) tracesModal.classList.remove('hidden');
                     await fetchTraces();
                 }, 1500);
+            } else {
+                addMessage(`❌ Auditor Error: ${data.message || 'Rate limit or server error.'}`, 'system');
             }
         } catch (e) {
             console.error(e);
