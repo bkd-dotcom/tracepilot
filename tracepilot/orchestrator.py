@@ -131,40 +131,8 @@ async def run_query(query: str, db_path: str = "tracepilot_memory.db") -> str:
     final_tool = selected_tool
     fallback_used = False
     
-    # Step 5: If failed, try fallback
-    if not success:
-        fallback_tool = FALLBACK_MAP[selected_tool]
-        fallback_func = TOOL_MAP[fallback_tool]
-        fallback_agent = _create_agent(fallback_func)
-        
-        fallback_start = time.time()
-        fallback_result, fallback_success = await _run_agent(fallback_agent, query)
-        fallback_latency = time.time() - fallback_start
-        
-        # Recovery cost = cost of the failed primary call
-        recovery_cost = primary_cost
-        
-        if fallback_success:
-            # Record the failed primary run
-            record_run(category, selected_tool, False, primary_cost, primary_latency, 0.0, db_path)
-            # Record the successful fallback run
-            record_run(category, fallback_tool, True, TOOL_COSTS[fallback_tool], fallback_latency, 0.0, db_path)
-            
-            result_text = fallback_result
-            success = True
-            final_tool = f"{selected_tool} → {fallback_tool}"
-            primary_latency += fallback_latency
-            primary_cost += TOOL_COSTS[fallback_tool]
-            fallback_used = True
-        else:
-            # Both failed
-            record_run(category, selected_tool, False, primary_cost, primary_latency, 0.0, db_path)
-            record_run(category, fallback_tool, False, TOOL_COSTS[fallback_tool], fallback_latency, 0.0, db_path)
-            primary_latency += fallback_latency
-            primary_cost += TOOL_COSTS[fallback_tool]
-    else:
-        # Primary succeeded
-        record_run(category, selected_tool, True, primary_cost, primary_latency, 0.0, db_path)
+    # Step 5: Record the result (No fallback per user request)
+    record_run(category, selected_tool, success, primary_cost, primary_latency, 0.0, db_path)
     
     # Step 6: Print run result
     print_run_result(
