@@ -105,35 +105,16 @@ def get_timeline():
     from tracepilot.events import get_events
     return get_events()
 
-def _run_threaded_query(q: str):
-    import asyncio
-    from dotenv import load_dotenv
-    load_dotenv()
-    
-    from tracepilot.orchestrator import run_query
-    result = asyncio.run(run_query(q))
-    
-    # Force flush so traces are immediately available in Phoenix
-    from opentelemetry import trace
-    provider = trace.get_tracer_provider()
-    if hasattr(provider, 'force_flush'):
-        provider.force_flush()
-        
-    return result
-
 @app.post("/api/query")
-def handle_query(request: QueryRequest):
-    from concurrent.futures import ThreadPoolExecutor
+async def handle_query(request: QueryRequest):
     try:
         print(f"[DEBUG API] Received request.query: '{request.query}'")
-        # Run the ADK agent query in a dedicated thread
-        with ThreadPoolExecutor(max_workers=1) as executor:
-            future = executor.submit(_run_threaded_query, request.query)
-            result = future.result()
+        from tracepilot.orchestrator import run_query
+        result = await run_query(request.query)
 
-        # Step 1.5: Give Uvicorn/OTel a brief moment to flush the traces synchronously 
-        import time
-        time.sleep(0.3)
+        # Give Uvicorn/OTel a brief moment to flush the traces
+        import asyncio
+        await asyncio.sleep(0.3)
         
         print(f"[DEBUG API] Returning result: {str(result)[:200]}")
         return {"status": "success", "response": result}
@@ -143,14 +124,14 @@ def handle_query(request: QueryRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/evaluate_jury")
-def evaluate_jury():
+async def evaluate_jury():
     """Triggered by the frontend immediately after a query returns."""
-    import time
-    # Sleep to ensure Phoenix ingestion worker finishes writing to SQLite before we query it
-    time.sleep(3.0)
+    import asyncio
+    # Sleep to ensure traces are flushed
+    await asyncio.sleep(3.0)
     try:
-        from tracepilot.evaluator import run_evaluations
-        run_evaluations()
+        from tracepilot.evaluator import async_run_evaluations
+        await async_run_evaluations()
         return {"status": "success"}
     except Exception as e:
         import traceback
@@ -249,6 +230,15 @@ def get_documents():
             return {"status": "success", "data": docs}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/test-mcp")
+def test_mcp_local():
+    import subprocess
+    try:
+        result = subprocess.run(["python", "tracepilot/mcp_server.py", "--help"], capture_output=True, text=True, timeout=5)
+        return {"stdout": result.stdout, "stderr": result.stderr, "code": result.returncode}
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/api/traces")
 def get_traces():
