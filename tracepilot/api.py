@@ -291,7 +291,8 @@ def get_traces():
             output_val_raw = output_wrapper.get("value", "") if isinstance(output_wrapper, dict) else str(output_wrapper)
             try:
                 inner = json.loads(output_val_raw) if output_val_raw else {}
-                status = "Error" if inner.get("status") == "error" or "error" in inner.get("type", "").lower() else "Success"
+                resp = inner.get("response", inner)
+                status = "Error" if resp.get("status") == "error" or "error" in inner.get("type", "").lower() else "Success"
             except Exception:
                 # Fallback: string search
                 status = "Error" if '"status": "error"' in output_val_raw or "error" in output_val_raw.lower()[:60] else "Success"

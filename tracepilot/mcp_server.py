@@ -51,9 +51,11 @@ def get_recent_tool_executions(limit: int = 5) -> str:
             # The value itself is a JSON string — parse it to get the actual tool result
             try:
                 inner = json.loads(output_val_raw) if output_val_raw else {}
-                # Determine status from the parsed result
-                has_error = inner.get("status") == "error" or "error" in str(inner.get("type", "")).lower()
-                output_summary = f"status={inner.get('status', 'success')}, source={inner.get('source', tool_name)}"
+                resp = inner.get("response", inner)
+                has_error = resp.get("status") == "error" or "error" in str(inner.get("type", "")).lower()
+                output_summary = f"status={resp.get('status', 'success')}, source={resp.get('source', tool_name)}"
+                if resp.get("error"):
+                    output_summary += f", error={resp.get('error')}"
             except Exception:
                 has_error = "error" in output_val_raw.lower()[:100]
                 output_summary = output_val_raw[:200]

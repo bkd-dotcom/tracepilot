@@ -48,7 +48,13 @@ async def async_run_evaluations():
         # output.value is itself a JSON string — parse it for summary
         try:
             inner = json.loads(output_val_raw) if output_val_raw else {}
-            output_val = f"status={inner.get('status','ok')}, source={inner.get('source', actual_tool_name)}"
+            resp = inner.get("response", inner)
+            status = resp.get("status", "ok")
+            source = resp.get("source", actual_tool_name)
+            error_msg = resp.get("error", "")
+            output_val = f"status={status}, source={source}"
+            if error_msg:
+                output_val += f", error={error_msg}"
         except Exception:
             output_val = str(output_val_raw)[:300]
         # Prepare rich trace data for the LLM
