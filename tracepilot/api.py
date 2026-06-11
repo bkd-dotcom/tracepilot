@@ -14,7 +14,17 @@ from tracepilot.tracing import init_tracing
 # Initialize tracing globally once when the FastAPI server starts
 init_tracing()
 
-app = FastAPI(title="TracePilot API")
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    import phoenix as px
+    import os
+    os.environ["PHOENIX_PORT"] = "6006"
+    px.launch_app(use_temp_dir=False)
+    yield
+
+app = FastAPI(title="TracePilot API", lifespan=lifespan)
 
 # Mount the static directory for HTML/CSS/JS
 static_dir = os.path.join(os.path.dirname(__file__), "static")

@@ -43,10 +43,8 @@ async def async_run_evaluations():
         hex_id = row[0]
         tool_name = row[1]
         attributes = json.loads(row[2]) if row[2] else {}
-        
-        actual_tool_name = attributes.get("tool.name", tool_name).replace("execute_tool ", "")
-        output_val = str(attributes.get("output.value", ""))
-        
+        actual_tool_name = attributes.get("tool", {}).get("name", tool_name).replace("execute_tool ", "")
+        output_val = str(attributes.get("output", {}).get("value", ""))
         # Prepare rich trace data for the LLM
         traces_to_eval = [{
             "trace_id": hex_id,

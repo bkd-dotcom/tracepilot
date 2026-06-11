@@ -48,12 +48,6 @@ RUN echo '#!/bin/bash\n\
 # Save the Cloud Run provided PORT\n\
 export CLOUD_RUN_PORT="${PORT:-7860}"\n\
 \n\
-# Start the local Open-Source Phoenix Server in the background\n\
-PHOENIX_PORT=6006 PHOENIX_HOST=0.0.0.0 python -m phoenix.server.main serve &\n\
-\n\
-# Wait for Phoenix to start\n\
-sleep 5\n\
-\n\
 # Start the FastAPI application on the Cloud Run port\n\
 export PORT=$CLOUD_RUN_PORT\n\
 uvicorn tracepilot.api:app --host 0.0.0.0 --port $PORT\n\
