@@ -23,27 +23,36 @@ async def async_run_evaluations():
     client = Client(base_url="http://localhost:6006")
     
     try:
-        # Fetch the MOST RECENT trace directly from Phoenix
-        traces = client.traces.get_traces(project_identifier=PROJECT_NAME, limit=1, sort="start_time", order="desc")
-        if not traces:
+        import pandas as pd
+        # Fetch spans to get the actual tool execution details and outputs
+        df = client.spans.get_spans_dataframe(project_name=PROJECT_NAME)
+        if df is None or df.empty:
             console.print("[yellow]No traces found to evaluate.[/yellow]")
             return 0
-    except Exception as e:
-        console.print(f"[red]Error fetching traces from Phoenix: {e}[/red]")
-        return 0
-
-    # Prepare trace data for the LLM
-    traces_to_eval = []
-    for trace in traces:
-        # trace is a dict from get_traces
-        hex_id = trace.get("trace_id", trace.get("id"))
             
-        trace_info = {
+        if "attributes.tool.name" in df.columns:
+            tool_spans = df[df["attributes.tool.name"].notnull()]
+        else:
+            tool_spans = df[df.get("span_kind", "") == "TOOL"] if "span_kind" in df.columns else df
+            
+        recent = tool_spans.tail(1).fillna("").to_dict(orient="records")
+        if not recent:
+            return 0
+            
+        r = recent[0]
+        tool_name = str(r.get("attributes.tool.name", r.get("name", "Unknown"))).replace("execute_tool ", "")
+        output_val = str(r.get("attributes.output.value", ""))
+        hex_id = str(r.get("trace_id", ""))
+        
+        # Prepare rich trace data for the LLM
+        traces_to_eval = [{
             "trace_id": hex_id,
-            "name": trace.get("name", "Unknown"),
-            "latency": trace.get("latency_ms", 0)
-        }
-        traces_to_eval.append(trace_info)
+            "name": tool_name,
+            "output": output_val[:500]  # truncated to save tokens
+        }]
+    except Exception as e:
+        console.print(f"[red]Error fetching tool spans from Phoenix: {e}[/red]")
+        return 0
 
     traces_json_str = json.dumps(traces_to_eval, indent=2)
 
