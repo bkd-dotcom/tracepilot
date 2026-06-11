@@ -1,3 +1,4 @@
+import fastapi
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -127,13 +128,14 @@ def handle_query(request: QueryRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/audit")
-async def handle_audit():
+async def handle_audit(background_tasks: fastapi.BackgroundTasks = None):
     try:
         from tracepilot.auditor import async_run_audit
         from tracepilot.memory import get_confidence_table, _recalculate_all
         from rich.console import Console
         from tracepilot.display import print_audit_summary, print_confidence_table
         from tracepilot.events import emit_event
+        from tracepilot.evaluator import run_evaluations
         
         console = Console()
         db_path = "tracepilot_memory.db"
@@ -159,7 +161,21 @@ async def handle_audit():
         console.print("\n[bold]Current Economic Memory:[/bold]")
         print_confidence_table(after)
         
-        return {"status": "success", "message": "Audit complete. Memory updated.", "data": after}
+        def background_eval():
+            try:
+                console.print("[dim]Starting LLM Jury Evaluation in background...[/dim]")
+                run_evaluations()
+            except Exception as e:
+                console.print(f"[red]Error in Jury Eval: {e}[/red]")
+                
+        if background_tasks:
+            background_tasks.add_task(background_eval)
+        else:
+            # Fallback if somehow not provided
+            import threading
+            threading.Thread(target=background_eval).start()
+        
+        return {"status": "success", "message": "Audit complete. Memory updated. Jury evaluations started in background.", "data": after}
     except Exception as e:
         import traceback
         traceback.print_exc()
