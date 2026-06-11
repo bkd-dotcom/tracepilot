@@ -45,14 +45,20 @@ EXPOSE 7860
 
 # Create a startup script
 RUN echo '#!/bin/bash\n\
+# Save the Cloud Run provided PORT\n\
+export CLOUD_RUN_PORT="${PORT:-7860}"\n\
+\n\
 # Start the local Open-Source Phoenix Server in the background\n\
-python -m phoenix.server.main serve --host 0.0.0.0 --port 6006 &\n\
+export PORT=6006\n\
+export HOST=0.0.0.0\n\
+python -m phoenix.server.main serve &\n\
 \n\
 # Wait for Phoenix to start\n\
 sleep 5\n\
 \n\
-# Start the FastAPI application on the port HuggingFace expects\n\
-uvicorn tracepilot.api:app --host 0.0.0.0 --port 7860\n\
+# Start the FastAPI application on the Cloud Run port\n\
+export PORT=$CLOUD_RUN_PORT\n\
+uvicorn tracepilot.api:app --host 0.0.0.0 --port $PORT\n\
 ' > /app/start.sh
 
 RUN chmod +x /app/start.sh
