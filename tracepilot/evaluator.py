@@ -23,8 +23,8 @@ async def async_run_evaluations():
     client = Client()
     
     try:
-        # Fetch the traces directly from Phoenix
-        traces = client.traces.get_traces(project_identifier=PROJECT_NAME, limit=10)
+        # Fetch the MOST RECENT trace directly from Phoenix
+        traces = client.traces.get_traces(project_identifier=PROJECT_NAME, limit=1, sort="start_time", order="desc")
         if not traces:
             console.print("[yellow]No traces found to evaluate.[/yellow]")
             return 0
@@ -139,10 +139,25 @@ Output ONLY the JSON and nothing else.
                         continue
                     rowid = row[0]
                     
+                    from rich.table import Table
+                    from rich import box
+                    
+                    is_success = float(eval_obj["helpfulness"]) >= 0.5
+                    color = "green" if is_success else "red"
+                    icon = "🟢" if is_success else "🔴"
+                    
+                    table = Table(show_header=True, header_style=f"bold {color}", box=box.ROUNDED)
+                    table.add_column("Metric", width=15)
+                    table.add_column("Score", justify="center", width=10)
+                    table.add_column("LLM Judge Reasoning")
+                    
                     for metric in ["helpfulness", "safety", "efficiency"]:
                         score = float(eval_obj[metric])
                         label = "PASS" if score >= 0.5 else "FAIL"
                         explanation = eval_obj["rationale"]
+                        
+                        m_color = "green" if score >= 0.5 else "red"
+                        table.add_row(metric.capitalize(), f"[{m_color}]{score}[/{m_color}]", explanation)
                         
                         cursor.execute("""
                             INSERT INTO trace_annotations 
@@ -150,15 +165,17 @@ Output ONLY the JSON and nothing else.
                             VALUES (?, ?, ?, ?, ?, '{}', 'LLM', 'API')
                         """, (rowid, metric.capitalize(), label, score, explanation))
                         
+                    console.print(f"\\n[bold]{icon} LIVE LLM JURY EVALUATION (Trace: {trace_hex[:8]}...)[/bold]")
+                    console.print(table)
+                        
                 conn.commit()
                 conn.close()
                 evaluations_logged += len(eval_records)
-                console.print(f"\\n[bold green]Successfully injected {len(eval_records) * 3} metrics directly into Phoenix UI![/bold green]")
             except Exception as e:
                 console.print(f"[dim]Failed to log eval to Phoenix DB: {e}[/dim]")
                     
     except Exception as e:
-        console.print(f"[yellow]Could not parse Jury Agent JSON output: {e}[/yellow]\nOutput was: {result_text}")
+        console.print(f"[yellow]Could not parse Jury Agent JSON output: {e}[/yellow]\\nOutput was: {result_text}")
         
     return evaluations_logged
 

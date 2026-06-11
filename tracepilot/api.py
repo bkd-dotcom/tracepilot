@@ -112,14 +112,27 @@ def _run_threaded_query(q: str):
     return result
 
 @app.post("/api/query")
-def handle_query(request: QueryRequest):
+def handle_query(request: QueryRequest, background_tasks: fastapi.BackgroundTasks):
     from concurrent.futures import ThreadPoolExecutor
+    from tracepilot.evaluator import run_evaluations
     try:
         # Run in a separate thread to avoid Google ADK / httpx async conflicts without process overhead
         print(f"[DEBUG API] Received request.query: '{request.query}'")
         with ThreadPoolExecutor(max_workers=1) as executor:
             future = executor.submit(_run_threaded_query, request.query)
             result = future.result()
+            
+        def background_eval():
+            import time
+            time.sleep(2) # Give Phoenix a moment to fully index the trace
+            try:
+                print("\\n[dim]Triggering live LLM evaluation...[/dim]")
+                run_evaluations()
+            except Exception as e:
+                print(f"[red]Error in Live Eval: {e}[/red]")
+                
+        background_tasks.add_task(background_eval)
+        
         print(f"[DEBUG API] Returning result: {str(result)[:200]}")
         return {"status": "success", "response": result}
     except Exception as e:
