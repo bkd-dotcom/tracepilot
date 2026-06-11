@@ -147,7 +147,7 @@ async def evaluate_jury():
     """Triggered by the frontend immediately after a query returns."""
     import time
     # Sleep to ensure Phoenix ingestion worker finishes writing to SQLite before we query it
-    time.sleep(1.0)
+    time.sleep(3.0)
     try:
         from tracepilot.evaluator import run_evaluations
         run_evaluations()
