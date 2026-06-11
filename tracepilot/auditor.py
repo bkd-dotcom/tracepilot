@@ -25,9 +25,9 @@ async def async_run_audit(db_path: str = "tracepilot_memory.db"):
     mcp_toolset = McpToolset(
         connection_params=StdioConnectionParams(
             server_params=StdioServerParameters(
-                command="phoenix-mcp",
+                command="python",
                 args=[
-                    "--baseUrl", "http://127.0.0.1:6006"
+                    "tracepilot/mcp_server.py"
                 ]
             )
         ),

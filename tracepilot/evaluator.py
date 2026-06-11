@@ -35,6 +35,9 @@ async def async_run_evaluations():
         else:
             tool_spans = df[df.get("span_kind", "") == "TOOL"] if "span_kind" in df.columns else df
             
+        if "start_time" in tool_spans.columns:
+            tool_spans = tool_spans.sort_values(by="start_time")
+            
         recent = tool_spans.tail(1).fillna("").to_dict(orient="records")
         if not recent:
             return 0
