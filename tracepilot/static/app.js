@@ -355,6 +355,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Refresh memory table and timeline
                 fetchMemory();
                 fetchTimeline();
+                
+                // Fire the LLM jury asynchronously to avoid Cloud Run freezing
+                try {
+                    await fetch('/api/evaluate_jury', { method: 'POST' });
+                    fetchTimeline(); // refresh timeline with jury result
+                    
+                    // Update traces table after jury finishes
+                    const tracesModal = document.getElementById('traces-modal');
+                    if (tracesModal && !tracesModal.classList.contains('hidden')) {
+                        await fetchTraces();
+                    }
+                } catch (err) {
+                    console.error("Jury evaluation error:", err);
+                }
             }
         } catch (e) {
             console.error(e);

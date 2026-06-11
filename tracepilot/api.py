@@ -121,30 +121,19 @@ def _run_threaded_query(q: str):
         
     return result
 
-def _run_background_evaluation():
-    """Runs LLM Jury in a daemon thread. Does NOT block the HTTP response."""
-    import time
-    time.sleep(2)  # Allow OTel exporter to flush spans first
-    try:
-        from tracepilot.evaluator import run_evaluations
-        run_evaluations()
-    except Exception as e:
-        print(f"[Background Eval Error]: {e}")
-
 @app.post("/api/query")
-def handle_query(request: QueryRequest, background_tasks: fastapi.BackgroundTasks):
+def handle_query(request: QueryRequest):
     from concurrent.futures import ThreadPoolExecutor
-    import threading
     try:
         print(f"[DEBUG API] Received request.query: '{request.query}'")
-        # Step 1: Run the ADK agent query in a dedicated thread
+        # Run the ADK agent query in a dedicated thread
         with ThreadPoolExecutor(max_workers=1) as executor:
             future = executor.submit(_run_threaded_query, request.query)
             result = future.result()
 
-        # Step 2: Fire-and-forget the LLM Jury as a daemon thread — NEVER blocks response
-        eval_thread = threading.Thread(target=_run_background_evaluation, daemon=True)
-        eval_thread.start()
+        # Step 1.5: Give Uvicorn/OTel a brief moment to flush the traces synchronously 
+        import time
+        time.sleep(0.3)
         
         print(f"[DEBUG API] Returning result: {str(result)[:200]}")
         return {"status": "success", "response": result}
@@ -152,6 +141,21 @@ def handle_query(request: QueryRequest, background_tasks: fastapi.BackgroundTask
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/evaluate_jury")
+async def evaluate_jury():
+    """Triggered by the frontend immediately after a query returns."""
+    import time
+    # Sleep to ensure Phoenix ingestion worker finishes writing to SQLite before we query it
+    time.sleep(1.0)
+    try:
+        from tracepilot.evaluator import run_evaluations
+        run_evaluations()
+        return {"status": "success"}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {"status": "error", "message": str(e)}
 
 @app.post("/api/audit")
 async def handle_audit(background_tasks: fastapi.BackgroundTasks = None):

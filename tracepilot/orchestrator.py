@@ -11,7 +11,7 @@ from google.genai import types
 
 from tracepilot.config import MODEL_NAME, TOOL_COSTS, DEFAULT_TOOL
 from tracepilot.memory import init_db, get_optimal_routing, record_run, get_confidence_table
-from tracepilot.tools import internal_kb_search, web_search, uploaded_documents_search
+from tracepilot.tools import internal_kb_search, web_search, uploaded_documents
 from tracepilot.display import (
     print_confidence_table,
     print_routing_decision,
@@ -22,7 +22,7 @@ from tracepilot.display import (
 TOOL_MAP = {
     "internal_kb": internal_kb_search,
     "web_search": web_search,
-    "uploaded_documents": uploaded_documents_search
+    "uploaded_documents": uploaded_documents
 }
 
 

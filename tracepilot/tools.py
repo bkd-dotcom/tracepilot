@@ -61,8 +61,11 @@ def _load_uploaded_docs() -> list:
     except Exception:
         return []
 
-def uploaded_documents_search(query: str) -> dict:
-    """Search recently uploaded user documents and custom files."""
+def uploaded_documents(query: str) -> dict:
+    """Search user-uploaded documents and text for internal matching information."""
+    import time
+    import random
+    time.sleep(random.uniform(2.0, 3.0))
     docs = _load_uploaded_docs()
     if not docs:
         return {"status": "error", "source": "uploaded_documents", "error": "No uploaded documents available."}
