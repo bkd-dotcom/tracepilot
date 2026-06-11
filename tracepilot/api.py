@@ -146,7 +146,7 @@ async def handle_audit(background_tasks: fastapi.BackgroundTasks = None):
         from rich.console import Console
         from tracepilot.display import print_audit_summary, print_confidence_table
         from tracepilot.events import emit_event
-        from tracepilot.evaluator import run_evaluations
+        from tracepilot.evaluator import async_run_evaluations
         
         console = Console()
         db_path = "tracepilot_memory.db"
@@ -175,7 +175,7 @@ async def handle_audit(background_tasks: fastapi.BackgroundTasks = None):
         # Cloud Run freezes CPU after response, must evaluate synchronously
         try:
             console.print("[dim]Starting LLM Jury Evaluation...[/dim]")
-            run_evaluations()
+            await async_run_evaluations()
         except Exception as e:
             console.print(f"[red]Error in Jury Eval: {e}[/red]")
         

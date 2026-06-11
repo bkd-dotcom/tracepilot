@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "timestamp": "2026-06-10T11:16:06.442351",
+    "timestamp": "2026-06-10T23:49:25.755792",
     "type": "routing",
     "title": "Routing Decision",
     "description": "Routed query to 'web_search' (Confidence: 0.50)",
@@ -12,12 +12,12 @@
   },
   {
     "id": 2,
-    "timestamp": "2026-06-10T11:16:21.502179",
+    "timestamp": "2026-06-10T23:49:35.223696",
     "type": "failure",
     "title": "Execution Complete",
-    "description": "Query executed via 'web_search' in 15.05s",
+    "description": "Query executed via 'web_search' in 9.46s",
     "metrics": {
-      "latency": 15.048785924911499,
+      "latency": 9.462147235870361,
       "cost": 0.12,
       "recovery_cost": 0.0,
       "success": false
@@ -25,72 +25,46 @@
   },
   {
     "id": 3,
-    "timestamp": "2026-06-10T14:00:12.709625",
-    "type": "routing",
-    "title": "Routing Decision",
-    "description": "Routed query to 'web_search' (Confidence: 0.50)",
+    "timestamp": "2026-06-10T23:49:43.482791",
+    "type": "learning",
+    "title": "Phoenix Evaluations Logged",
+    "description": "LLM Jury evaluated traces and pushed 1 scores to Arize Phoenix.",
     "metrics": {
-      "mode": "explore",
-      "options": []
+      "evaluations": 1
     }
   },
   {
     "id": 4,
-    "timestamp": "2026-06-10T14:00:13.083807",
-    "type": "failure",
-    "title": "Execution Complete",
-    "description": "Query executed via 'web_search' in 0.37s",
+    "timestamp": "2026-06-10T23:50:07.491500",
+    "type": "learning",
+    "title": "Memory Correction",
+    "description": "MCP Auditor Agent found 2 hidden LLM failure(s). Confidence scores recalculated.",
     "metrics": {
-      "latency": 0.3672361373901367,
-      "cost": 0.12,
-      "recovery_cost": 0.0,
-      "success": false
+      "corrections": 2
     }
   },
   {
     "id": 5,
-    "timestamp": "2026-06-10T14:54:16.278831",
-    "type": "routing",
-    "title": "Routing Decision",
-    "description": "Routed query to 'web_search' (Confidence: 0.47)",
+    "timestamp": "2026-06-10T23:50:15.210780",
+    "type": "learning",
+    "title": "Phoenix Evaluations Logged",
+    "description": "LLM Jury evaluated traces and pushed 1 scores to Arize Phoenix.",
     "metrics": {
-      "mode": "exploit",
-      "options": [
-        {
-          "tool": "web_search",
-          "confidence": 0.47,
-          "success_rate": 0.0,
-          "avg_cost": 0.12,
-          "avg_recovery_cost": 0.0
-        }
-      ]
+      "evaluations": 1
     }
   },
   {
     "id": 6,
-    "timestamp": "2026-06-10T14:54:20.977069",
-    "type": "system",
-    "title": "Execution Complete",
-    "description": "Query executed via 'web_search' in 4.69s",
-    "metrics": {
-      "latency": 4.686116695404053,
-      "cost": 0.12,
-      "recovery_cost": 0.0,
-      "success": true
-    }
-  },
-  {
-    "id": 7,
-    "timestamp": "2026-06-10T14:54:20.981733",
+    "timestamp": "2026-06-10T23:50:33.936928",
     "type": "routing",
     "title": "Routing Decision",
-    "description": "Routed query to 'uploaded_documents' (Confidence: 0.33)",
+    "description": "Routed query to 'uploaded_documents' (Confidence: 0.23)",
     "metrics": {
       "mode": "explore",
       "options": [
         {
           "tool": "web_search",
-          "confidence": 0.33,
+          "confidence": 0.23,
           "success_rate": 0.0,
           "avg_cost": 0.12,
           "avg_recovery_cost": 0.0
@@ -99,37 +73,67 @@
     }
   },
   {
-    "id": 8,
-    "timestamp": "2026-06-10T14:54:23.680208",
+    "id": 7,
+    "timestamp": "2026-06-10T23:50:37.574230",
     "type": "failure",
     "title": "Execution Complete",
-    "description": "Query executed via 'uploaded_documents' in 2.69s",
+    "description": "Query executed via 'uploaded_documents' in 3.63s",
     "metrics": {
-      "latency": 2.6869280338287354,
+      "latency": 3.6338260173797607,
       "cost": 0.005,
       "recovery_cost": 0.0,
       "success": false
     }
   },
   {
+    "id": 8,
+    "timestamp": "2026-06-10T23:50:46.223096",
+    "type": "learning",
+    "title": "Phoenix Evaluations Logged",
+    "description": "LLM Jury evaluated traces and pushed 1 scores to Arize Phoenix.",
+    "metrics": {
+      "evaluations": 1
+    }
+  },
+  {
     "id": 9,
-    "timestamp": "2026-06-10T14:58:55.877558",
+    "timestamp": "2026-06-10T23:51:20.821488",
+    "type": "learning",
+    "title": "Memory Correction",
+    "description": "MCP Auditor Agent found 2 hidden LLM failure(s). Confidence scores recalculated.",
+    "metrics": {
+      "corrections": 2
+    }
+  },
+  {
+    "id": 10,
+    "timestamp": "2026-06-10T23:51:37.564299",
+    "type": "learning",
+    "title": "Phoenix Evaluations Logged",
+    "description": "LLM Jury evaluated traces and pushed 1 scores to Arize Phoenix.",
+    "metrics": {
+      "evaluations": 1
+    }
+  },
+  {
+    "id": 11,
+    "timestamp": "2026-06-10T23:51:54.204490",
     "type": "routing",
     "title": "Routing Decision",
-    "description": "Routed query to 'uploaded_documents' (Confidence: 0.51)",
+    "description": "Routed query to 'internal_kb' (Confidence: 0.32)",
     "metrics": {
-      "mode": "exploit",
+      "mode": "explore",
       "options": [
         {
           "tool": "uploaded_documents",
-          "confidence": 0.51,
+          "confidence": 0.32,
           "success_rate": 0.0,
           "avg_cost": 0.005,
           "avg_recovery_cost": 0.0
         },
         {
           "tool": "web_search",
-          "confidence": 0.33,
+          "confidence": 0.23,
           "success_rate": 0.0,
           "avg_cost": 0.12,
           "avg_recovery_cost": 0.0
@@ -138,16 +142,26 @@
     }
   },
   {
-    "id": 10,
-    "timestamp": "2026-06-10T14:58:59.639299",
-    "type": "failure",
+    "id": 12,
+    "timestamp": "2026-06-10T23:51:56.844492",
+    "type": "system",
     "title": "Execution Complete",
-    "description": "Query executed via 'uploaded_documents' in 3.75s",
+    "description": "Query executed via 'internal_kb' in 2.63s",
     "metrics": {
-      "latency": 3.747596025466919,
-      "cost": 0.005,
+      "latency": 2.634477138519287,
+      "cost": 0.01,
       "recovery_cost": 0.0,
-      "success": false
+      "success": true
+    }
+  },
+  {
+    "id": 13,
+    "timestamp": "2026-06-10T23:52:02.748253",
+    "type": "learning",
+    "title": "Phoenix Evaluations Logged",
+    "description": "LLM Jury evaluated traces and pushed 1 scores to Arize Phoenix.",
+    "metrics": {
+      "evaluations": 1
     }
   }
 ]

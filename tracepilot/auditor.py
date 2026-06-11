@@ -84,7 +84,7 @@ Output ONLY the JSON and nothing else.
         clean_text = result_text.replace("```json", "").replace("```", "").strip()
         data = json.loads(clean_text)
         
-        penalties = data.get("penalties", [])
+        penalties = data if isinstance(data, list) else data.get("penalties", [])
         for penalty in penalties:
             tool_name = penalty.get("tool_name")
             if tool_name:
