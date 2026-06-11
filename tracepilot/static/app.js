@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // App Controls
     const btnRunAuditor = document.getElementById('btn-run-auditor');
+    const btnRunJury = document.getElementById('btn-run-jury');
     const btnResetSystem = document.getElementById('btn-reset-system');
     const promptChips = document.querySelectorAll('.chip');
     
@@ -295,6 +296,30 @@ document.addEventListener('DOMContentLoaded', () => {
             btnRunAuditor.disabled = false;
         }
     });
+
+    if (btnRunJury) {
+        btnRunJury.addEventListener('click', async () => {
+            btnRunJury.textContent = "Evaluating...";
+            btnRunJury.disabled = true;
+            
+            try {
+                const res = await fetch('/api/evaluate', { method: 'POST' });
+                const data = await res.json();
+                
+                if(data.status === 'started') {
+                    addMessage(`⚖️ LLM Jury started. Check Phoenix UI (Evaluations tab) in a few seconds.`, 'system');
+                } else {
+                    addMessage(`❌ Jury Error: ${data.message || 'Server error.'}`, 'system');
+                }
+            } catch (e) {
+                console.error(e);
+                addMessage(`Error running Jury evaluation.`, 'system');
+            } finally {
+                btnRunJury.textContent = "Run Phoenix Jury";
+                btnRunJury.disabled = false;
+            }
+        });
+    }
 
     // Helper Functions
     function addMessage(text, sender) {
