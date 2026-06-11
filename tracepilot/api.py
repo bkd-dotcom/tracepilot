@@ -255,11 +255,7 @@ def get_traces():
         if df is None or df.empty:
             return {"status": "success", "data": []}
             
-        last_reset = get_last_reset_time()
-        df['start_time'] = pd.to_datetime(df['start_time'], utc=True)
-        last_reset_dt = pd.to_datetime(last_reset, utc=True)
-        df = df[df['start_time'] >= last_reset_dt]
-        
+        df['start_time'] = pd.to_datetime(df['start_time'], utc=True, errors='coerce')
         df = df.sort_values(by="start_time")
         recent = df.tail(15).fillna("").to_dict(orient="records")
         
@@ -268,10 +264,10 @@ def get_traces():
             attributes_str = r.get("attributes", "{}")
             attributes = json.loads(attributes_str) if isinstance(attributes_str, str) else attributes_str
             
-            output_val = str(attributes.get("output.value", ""))
+            output_val = str(attributes.get("output", {}).get("value", ""))
             status = "Error" if '"status": "error"' in output_val or "'status': 'error'" in output_val else "Success"
             
-            tool_name = str(attributes.get("tool.name", ""))
+            tool_name = str(attributes.get("tool", {}).get("name", ""))
             if not tool_name:
                 tool_name = str(r.get("name", "Unknown")).replace("execute_tool ", "")
             
