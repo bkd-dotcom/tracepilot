@@ -2,6 +2,31 @@
   <img src="logo.svg" width="100%" alt="TracePilot Logo">
 </p>
 
+## 🚀 Live Demo
+
+**Public API Endpoint:** `https://tracepilot-712918182816.us-central1.run.app`
+
+### Test the Self-Healing Loop
+
+1. **Trigger a Mistake (The system will try to use `web_search` and fail):**
+```bash
+curl -X POST https://tracepilot-712918182816.us-central1.run.app/api/query \
+     -H "Content-Type: application/json" \
+     -d '{"query": "Find employee handbook section 7.3"}'
+```
+
+2. **Trigger the MCP Auditor:**
+```bash
+curl -X POST https://tracepilot-712918182816.us-central1.run.app/api/audit
+```
+
+3. **Trigger the Corrected Query (The system will reroute to `internal_kb`):**
+```bash
+curl -X POST https://tracepilot-712918182816.us-central1.run.app/api/query \
+     -H "Content-Type: application/json" \
+     -d '{"query": "Find employee handbook section 7.3"}'
+```
+
 TracePilot is an autonomous enterprise routing agent that **learns from its own observability traces** rather than relying on hardcoded LLM prompts. Built using the Google Agent Development Kit (ADK) and Arize Phoenix for the Google Cloud Rapid Agent Hackathon.
 
 ### 🌐 For the live demo: click this url -> [https://tracepilot-712918182816.us-central1.run.app](https://tracepilot-712918182816.us-central1.run.app)
