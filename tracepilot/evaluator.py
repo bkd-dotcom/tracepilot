@@ -35,8 +35,13 @@ async def async_run_evaluations():
     # Prepare trace data for the LLM
     traces_to_eval = []
     for trace in traces:
+        # Get the actual Hex Trace ID if available, otherwise fallback
+        hex_id = getattr(trace, 'trace_id', trace.id)
+        if hasattr(trace, 'context'):
+            hex_id = getattr(trace.context, 'trace_id', hex_id)
+            
         trace_info = {
-            "trace_id": trace.id,
+            "trace_id": hex_id,
             "name": trace.name,
             "latency": getattr(trace, 'latency_ms', 0)
         }
@@ -116,22 +121,41 @@ Output ONLY the JSON and nothing else.
                     "rationale": eval_obj.get("rationale", "Evaluated by Auditor Jury")
                 })
 
-        # Log Evaluations back to Arize Phoenix
+        # Log Evaluations back to Arize Phoenix using direct SQLite to bypass UI crash bugs
         if eval_records:
-            df = pd.DataFrame(eval_records)
-            df.set_index("trace_id", inplace=True)
-            
-            for metric in ["helpfulness", "safety", "efficiency"]:
-                metric_df = pd.DataFrame({
-                    "score": df[metric],
-                    "label": df[metric].apply(lambda x: "PASS" if x >= 0.5 else "FAIL"),
-                    "explanation": df["rationale"]
-                })
-                try:
-                    client.traces.log_trace_annotations_dataframe(dataframe=metric_df, annotation_name=metric.capitalize(), annotator_kind="LLM")
-                    evaluations_logged += len(eval_records)
-                except Exception as e:
-                    console.print(f"[dim]Failed to log {metric} eval to Phoenix: {e}[/dim]")
+            import sqlite3
+            db_path = '/Users/binaydalai/.phoenix/phoenix.db'
+            try:
+                conn = sqlite3.connect(db_path)
+                cursor = conn.cursor()
+                
+                for eval_obj in eval_records:
+                    trace_hex = eval_obj["trace_id"]
+                    
+                    # Fetch internal SQLite rowid
+                    cursor.execute("SELECT id FROM traces WHERE trace_id = ?", (trace_hex,))
+                    row = cursor.fetchone()
+                    if not row:
+                        continue
+                    rowid = row[0]
+                    
+                    for metric in ["helpfulness", "safety", "efficiency"]:
+                        score = float(eval_obj[metric])
+                        label = "PASS" if score >= 0.5 else "FAIL"
+                        explanation = eval_obj["rationale"]
+                        
+                        cursor.execute("""
+                            INSERT INTO trace_annotations 
+                            (trace_rowid, name, label, score, explanation, metadata, annotator_kind, source)
+                            VALUES (?, ?, ?, ?, ?, '{}', 'LLM', 'API')
+                        """, (rowid, metric.capitalize(), label, score, explanation))
+                        
+                conn.commit()
+                conn.close()
+                evaluations_logged += len(eval_records)
+                console.print(f"\\n[bold green]Successfully injected {len(eval_records) * 3} metrics directly into Phoenix UI![/bold green]")
+            except Exception as e:
+                console.print(f"[dim]Failed to log eval to Phoenix DB: {e}[/dim]")
                     
     except Exception as e:
         console.print(f"[yellow]Could not parse Jury Agent JSON output: {e}[/yellow]\nOutput was: {result_text}")
