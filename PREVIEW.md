@@ -1,4 +1,4 @@
-# 🕵️ TracePilot: Step-by-Step Preview
+# TracePilot: Step-by-Step Preview
 
 Welcome to the TracePilot preview! This guide walks you through exactly how the platform works using screenshots from a live demonstration. 
 
@@ -115,7 +115,7 @@ The Live LLM Jury reviews the new trace and awards the agent a perfect score:
 
 ---
 
-### 🎉 Conclusion
+### Conclusion
 TracePilot successfully **self-healed**. Without any developer intervention, prompt engineering, or manual routing rules, the agent learned from its telemetry traces, penalized the wrong tool, and found the correct path. 
 
 All future queries of this type will instantly bypass the exploration phase and utilize the `uploaded_documents` tool with maximum efficiency!
