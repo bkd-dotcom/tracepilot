@@ -66,7 +66,7 @@ Output ONLY the JSON and nothing else.
             session_id=session.id,
             new_message=types.Content(
                 role="user",
-                parts=[types.Part(text="Fetch the traces. Find any tool failures. Return the JSON.")]
+                parts=[types.Part(text="URGENT: Fetch the traces immediately. Find any tool failures and ONLY return the JSON array of penalties. Be extremely concise to minimize latency. Do not explain.")]
             ),
         ):
             if event.is_final_response() and event.content and event.content.parts:

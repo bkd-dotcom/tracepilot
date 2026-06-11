@@ -122,16 +122,14 @@ def handle_query(request: QueryRequest, background_tasks: fastapi.BackgroundTask
             future = executor.submit(_run_threaded_query, request.query)
             result = future.result()
             
-        def background_eval():
-            import time
-            time.sleep(2) # Give Phoenix a moment to fully index the trace
-            try:
-                print("\\n[dim]Triggering live LLM evaluation...[/dim]")
-                run_evaluations()
-            except Exception as e:
-                print(f"[red]Error in Live Eval: {e}[/red]")
-                
-        background_tasks.add_task(background_eval)
+        # Run synchronously because Cloud Run freezes background threads immediately after HTTP response
+        import time
+        time.sleep(1) # Wait for OpenTelemetry flush
+        try:
+            print("\\n[dim]Triggering live LLM evaluation...[/dim]")
+            run_evaluations()
+        except Exception as e:
+            print(f"[red]Error in Live Eval: {e}[/red]")
         
         print(f"[DEBUG API] Returning result: {str(result)[:200]}")
         return {"status": "success", "response": result}
@@ -174,21 +172,14 @@ async def handle_audit(background_tasks: fastapi.BackgroundTasks = None):
         console.print("\n[bold]Current Economic Memory:[/bold]")
         print_confidence_table(after)
         
-        def background_eval():
-            try:
-                console.print("[dim]Starting LLM Jury Evaluation in background...[/dim]")
-                run_evaluations()
-            except Exception as e:
-                console.print(f"[red]Error in Jury Eval: {e}[/red]")
-                
-        if background_tasks:
-            background_tasks.add_task(background_eval)
-        else:
-            # Fallback if somehow not provided
-            import threading
-            threading.Thread(target=background_eval).start()
+        # Cloud Run freezes CPU after response, must evaluate synchronously
+        try:
+            console.print("[dim]Starting LLM Jury Evaluation...[/dim]")
+            run_evaluations()
+        except Exception as e:
+            console.print(f"[red]Error in Jury Eval: {e}[/red]")
         
-        return {"status": "success", "message": "Audit complete. Memory updated. Jury evaluations started in background.", "data": after}
+        return {"status": "success", "message": "Audit complete. Memory updated. Jury evaluations completed.", "data": after}
     except Exception as e:
         import traceback
         traceback.print_exc()
