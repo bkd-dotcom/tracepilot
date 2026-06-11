@@ -18,9 +18,8 @@ async def async_run_evaluations():
     
     from phoenix.client import Client
     import os
-    os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = PHOENIX_ENDPOINT
     os.environ.pop("PHOENIX_API_KEY", None)
-    client = Client()
+    client = Client(base_url=PHOENIX_ENDPOINT)
     
     try:
         # Fetch the MOST RECENT trace directly from Phoenix
