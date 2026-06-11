@@ -5,7 +5,7 @@ import json
 
 # Initialize FastMCP Server
 mcp = FastMCP("PhoenixTraceAuditor")
-client = Client(base_url="http://localhost:6006")
+client = Client()
 
 @mcp.tool()
 def get_recent_tool_executions(limit: int = 5) -> str:

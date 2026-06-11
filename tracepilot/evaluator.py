@@ -20,7 +20,7 @@ async def async_run_evaluations():
     import os
     os.environ.pop("PHOENIX_API_KEY", None)
     # Connect explicitly to the local Phoenix server
-    client = Client(base_url="http://localhost:6006")
+    client = Client()
     
     try:
         import pandas as pd
