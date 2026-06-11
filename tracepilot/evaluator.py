@@ -42,7 +42,7 @@ async def async_run_evaluations():
         r = recent[0]
         tool_name = str(r.get("attributes.tool.name", r.get("name", "Unknown"))).replace("execute_tool ", "")
         output_val = str(r.get("attributes.output.value", ""))
-        hex_id = str(r.get("trace_id", ""))
+        hex_id = str(r.get("context.trace_id", ""))
         
         # Prepare rich trace data for the LLM
         traces_to_eval = [{
