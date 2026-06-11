@@ -16,8 +16,8 @@ async def async_run_evaluations():
     console.print("\n[bold cyan]═══ TracePilot LLM Jury ═══[/bold cyan]")
     console.print("[dim]Fetching recent traces from Phoenix...[/dim]")
     
-    import phoenix as px
-    client = px.Client(endpoint=PHOENIX_ENDPOINT)
+    from phoenix.client import Client
+    client = Client(endpoint=PHOENIX_ENDPOINT)
     
     try:
         # Fetch the spans directly from Phoenix
