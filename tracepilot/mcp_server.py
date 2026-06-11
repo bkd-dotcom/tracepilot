@@ -4,7 +4,7 @@ import pandas as pd
 import json
 
 # Initialize FastMCP Server
-mcp = FastMCP("PhoenixTraceAuditor")
+mcp = FastMCP("PhoenixTraceAuditor", log_level="CRITICAL")
 client = Client()
 
 @mcp.tool()
