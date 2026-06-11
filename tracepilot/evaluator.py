@@ -19,7 +19,8 @@ async def async_run_evaluations():
     from phoenix.client import Client
     import os
     os.environ.pop("PHOENIX_API_KEY", None)
-    client = Client(base_url=PHOENIX_ENDPOINT)
+    # Connect explicitly to the local Phoenix server
+    client = Client(base_url="http://localhost:6006")
     
     try:
         # Fetch the MOST RECENT trace directly from Phoenix
