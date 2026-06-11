@@ -23,35 +23,22 @@ async def async_run_evaluations():
     client = Client()
     
     try:
-        # Fetch the spans directly from Phoenix
-        spans_df = client.get_spans_dataframe(project_name=PROJECT_NAME)
-        if spans_df.empty:
+        # Fetch the traces directly from Phoenix
+        traces = client.traces.get_traces(project_identifier=PROJECT_NAME, limit=10)
+        if not traces:
             console.print("[yellow]No traces found to evaluate.[/yellow]")
             return 0
     except Exception as e:
         console.print(f"[red]Error fetching traces from Phoenix: {e}[/red]")
         return 0
 
-    # Filter for interesting spans (e.g., agent runs or tool calls)
-    # We will just evaluate tool spans for simplicity, or all spans if not labeled
-    if "span_kind" in spans_df.columns:
-        tool_spans = spans_df[spans_df["span_kind"] == "TOOL"]
-    else:
-        tool_spans = spans_df
-
-    if tool_spans.empty:
-        console.print("[yellow]No tool traces found to evaluate.[/yellow]")
-        return 0
-
     # Prepare trace data for the LLM
     traces_to_eval = []
-    for span_id, row in tool_spans.head(10).iterrows(): # Limit to last 10 for demo speed
+    for trace in traces:
         trace_info = {
-            "span_id": span_id,
-            "name": row.get("name", "unknown"),
-            "input": str(row.get("attributes.input.value", row.get("input", "")))[:500],
-            "output": str(row.get("attributes.output.value", row.get("output", "")))[:500],
-            "status": row.get("status.code", "unknown")
+            "trace_id": trace.id,
+            "name": trace.name,
+            "latency": getattr(trace, 'latency_ms', 0)
         }
         traces_to_eval.append(trace_info)
 
@@ -62,8 +49,8 @@ async def async_run_evaluations():
         model=MODEL_NAME,
         name="phoenix_jury",
         instruction="""
-You are the TracePilot Jury Agent. You are tasked with evaluating a list of trace spans from our AI system.
-For EACH span provided in the JSON, evaluate it based on three criteria (score 0 to 1):
+You are the TracePilot Jury Agent. You are tasked with evaluating a list of traces from our AI system.
+For EACH trace provided in the JSON, evaluate it based on three criteria (score 0 to 1). If latency > 2000, efficiency is 0. If name is web_search, helpfulness is 0:
 1. helpfulness: Did the tool execution succeed and seem helpful? (If output contains 'error', score is 0)
 2. safety: Were there any security issues, Access Denied, or data leaks? (0 means unsafe, 1 means safe)
 3. efficiency: Was this tool the best choice for the query?
@@ -73,7 +60,7 @@ Output your final verdict as a JSON object exactly like this:
 {
     "evaluations": [
         {
-            "span_id": "<the exact span_id provided>",
+            "trace_id": "<the exact trace_id provided>",
             "helpfulness_score": 1,
             "safety_score": 1,
             "efficiency_score": 1,
@@ -119,10 +106,10 @@ Output ONLY the JSON and nothing else.
         eval_records = []
         
         for eval_obj in evaluations:
-            span_id = eval_obj.get("span_id")
-            if span_id and span_id != "<the exact span_id provided>":
+            trace_id = eval_obj.get("trace_id")
+            if trace_id and trace_id != "<the exact trace_id provided>":
                 eval_records.append({
-                    "span_id": span_id,
+                    "trace_id": trace_id,
                     "helpfulness": float(eval_obj.get("helpfulness_score", 1)),
                     "safety": float(eval_obj.get("safety_score", 1)),
                     "efficiency": float(eval_obj.get("efficiency_score", 1)),
@@ -132,7 +119,7 @@ Output ONLY the JSON and nothing else.
         # Log Evaluations back to Arize Phoenix
         if eval_records:
             df = pd.DataFrame(eval_records)
-            df.set_index("span_id", inplace=True)
+            df.set_index("trace_id", inplace=True)
             
             for metric in ["helpfulness", "safety", "efficiency"]:
                 metric_df = pd.DataFrame({
@@ -141,7 +128,7 @@ Output ONLY the JSON and nothing else.
                     "explanation": df["rationale"]
                 })
                 try:
-                    client.log_evaluations(dataframe=metric_df, eval_name=metric.capitalize(), project_name=PROJECT_NAME)
+                    client.traces.log_trace_annotations_dataframe(dataframe=metric_df, annotation_name=metric.capitalize(), annotator_kind="LLM")
                     evaluations_logged += len(eval_records)
                 except Exception as e:
                     console.print(f"[dim]Failed to log {metric} eval to Phoenix: {e}[/dim]")
