@@ -116,6 +116,7 @@ Output ONLY the JSON and nothing else.
 
     # Parse JSON output and Log Evaluations to Phoenix
     evaluations_logged = 0
+    eval_records = []
     try:
         # Strip markdown code blocks if any
         clean_text = result_text.replace("```json", "").replace("```", "").strip()
