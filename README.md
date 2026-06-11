@@ -1,6 +1,6 @@
-<p align="center">
-  <img src="logo.svg" width="100%" alt="TracePilot Logo">
-</p>
+# TracePilot
+
+TracePilot is an autonomous enterprise routing agent that **learns from its own observability traces** rather than relying on hardcoded LLM prompts. Built using the Google Agent Development Kit (ADK) and Arize Phoenix for the Google Cloud Rapid Agent Hackathon.
 
 ## 🚀 Live Demo
 
@@ -8,7 +8,7 @@
 
 **Public API Endpoint:** `https://tracepilot-712918182816.us-central1.run.app`
 
-### Test the Self-Healing Loop
+### Test the Self-Healing Loop via CLI
 
 1. **Trigger a Mistake (The system will try to use `web_search` and fail):**
 ```bash
@@ -29,9 +29,7 @@ curl -X POST https://tracepilot-712918182816.us-central1.run.app/api/query \
      -d '{"query": "Find employee handbook section 7.3"}'
 ```
 
-TracePilot is an autonomous enterprise routing agent that **learns from its own observability traces** rather than relying on hardcoded LLM prompts. Built using the Google Agent Development Kit (ADK) and Arize Phoenix for the Google Cloud Rapid Agent Hackathon.
-
-### 🌐 For the live demo: click this url -> [https://tracepilot-712918182816.us-central1.run.app](https://tracepilot-712918182816.us-central1.run.app)
+---
 
 ## The Core Concept: Why Not Just Use an LLM Router?
 
@@ -58,15 +56,6 @@ This self-healing loop means TracePilot literally learns how to do its job by re
 - **FastAPI:** Serves the backend orchestration endpoints and the UI.
 - **SQLite:** Powers the lightweight "Economic Memory" system without heavy database infrastructure.
 - **Google Cloud Run:** Hosts the production deployment.
-
-## Demo Scenarios
-
-When running the TracePilot demo, you can watch the agent learn in real-time:
-1. Ask a public query like "What is Python?". The agent will successfully route to `web_search`.
-2. Ask an internal query like "Find employee handbook section 8.1".
-3. Watch the agent mistakenly attempt to use the `web_search` and fail.
-4. Click **Run Phoenix Auditor**. The system will analyze the traces, detect the hidden tool failure, and penalize `web_search` for internal queries.
-5. Ask another internal query like "Find employee handbook section 7.3". Watch the agent enter **Explore Mode**, systematically testing `uploaded_documents` and `internal_kb` until it self-heals and finds the correct route!
 
 ## Running Locally
 
