@@ -35,15 +35,13 @@ async def async_run_evaluations():
     # Prepare trace data for the LLM
     traces_to_eval = []
     for trace in traces:
-        # Get the actual Hex Trace ID if available, otherwise fallback
-        hex_id = getattr(trace, 'trace_id', trace.id)
-        if hasattr(trace, 'context'):
-            hex_id = getattr(trace.context, 'trace_id', hex_id)
+        # trace is a dict from get_traces
+        hex_id = trace.get("trace_id", trace.get("id"))
             
         trace_info = {
             "trace_id": hex_id,
-            "name": trace.name,
-            "latency": getattr(trace, 'latency_ms', 0)
+            "name": trace.get("name", "Unknown"),
+            "latency": trace.get("latency_ms", 0)
         }
         traces_to_eval.append(trace_info)
 
