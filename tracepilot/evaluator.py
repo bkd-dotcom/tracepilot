@@ -44,7 +44,13 @@ async def async_run_evaluations():
         tool_name = row[1]
         attributes = json.loads(row[2]) if row[2] else {}
         actual_tool_name = attributes.get("tool", {}).get("name", tool_name).replace("execute_tool ", "")
-        output_val = str(attributes.get("output", {}).get("value", ""))
+        output_val_raw = attributes.get("output", {}).get("value", "")
+        # output.value is itself a JSON string — parse it for summary
+        try:
+            inner = json.loads(output_val_raw) if output_val_raw else {}
+            output_val = f"status={inner.get('status','ok')}, source={inner.get('source', actual_tool_name)}"
+        except Exception:
+            output_val = str(output_val_raw)[:300]
         # Prepare rich trace data for the LLM
         traces_to_eval = [{
             "trace_id": hex_id,
@@ -186,6 +192,28 @@ Output ONLY the JSON and nothing else.
     except Exception as e:
         console.print(f"[yellow]Could not parse Jury Agent JSON output: {e}[/yellow]\\nOutput was: {result_text}")
         
+    # Emit timeline event so the frontend shows jury results
+    if eval_records:
+        try:
+            from tracepilot.events import emit_event
+            first = eval_records[0]
+            h = float(first.get("helpfulness", 1.0))
+            s = float(first.get("safety", 1.0))
+            e = float(first.get("efficiency", 1.0))
+            verdict = "PASS" if h >= 0.5 else "FAIL"
+            emit_event(
+                type="learning",
+                title=f"LLM Jury Verdict: {verdict}",
+                description=(
+                    f"Tool: {first.get('trace_id','')[:8]}... | "
+                    f"Helpfulness={h:.1f} Safety={s:.1f} Efficiency={e:.1f} | "
+                    f"{first.get('rationale','')[:80]}"
+                ),
+                metrics={"helpfulness": h, "safety": s, "efficiency": e}
+            )
+        except Exception as emit_err:
+            console.print(f"[dim]Could not emit timeline event: {emit_err}[/dim]")
+
     return evaluations_logged
 
 def run_evaluations() -> None:

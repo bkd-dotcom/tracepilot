@@ -37,14 +37,37 @@ def get_recent_tool_executions(limit: int = 5) -> str:
         results = []
         for row in rows:
             name = row[0]
-            attributes = json.loads(row[1]) if row[1] else {}
+            try:
+                attributes = json.loads(row[1]) if row[1] else {}
+            except Exception:
+                attributes = {}
             
-            tool_name = attributes.get("tool.name", name).replace("execute_tool ", "")
-            output_val = str(attributes.get("output.value", ""))
+            # Correctly extract from nested dicts (not flat dotted keys)
+            tool_obj = attributes.get("tool", {})
+            tool_name = tool_obj.get("name", name).replace("execute_tool ", "") if isinstance(tool_obj, dict) else name
+            
+            output_obj = attributes.get("output", {})
+            output_val_raw = output_obj.get("value", "") if isinstance(output_obj, dict) else ""
+            # The value itself is a JSON string — parse it to get the actual tool result
+            try:
+                inner = json.loads(output_val_raw) if output_val_raw else {}
+                # Determine status from the parsed result
+                has_error = inner.get("status") == "error" or "error" in str(inner.get("type", "")).lower()
+                output_summary = f"status={inner.get('status', 'success')}, source={inner.get('source', tool_name)}"
+            except Exception:
+                has_error = "error" in output_val_raw.lower()[:100]
+                output_summary = output_val_raw[:200]
+            
+            # Also check the span-level error attribute
+            error_attr = attributes.get("error", {})
+            if isinstance(error_attr, dict) and error_attr.get("type"):
+                has_error = True
+                output_summary = f"TOOL_ERROR: {error_attr.get('type')}"
             
             results.append({
                 "tool_name": tool_name,
-                "output": output_val[:200]  # truncate to prevent massive payload
+                "has_error": has_error,
+                "output": output_summary
             })
             
         return json.dumps(results)

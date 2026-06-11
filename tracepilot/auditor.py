@@ -39,13 +39,13 @@ async def async_run_audit(db_path: str = "tracepilot_memory.db"):
         name="phoenix_auditor",
         instruction="""
 You are the TracePilot Auditor Agent. Your job is to use the Phoenix MCP server to query recent traces.
-Call your tool to fetch traces. 
-Analyze the traces for any tool span where the output contains the word 'error' or 'Access Denied'.
-If you find a failing tool, you must penalize it by outputting a JSON object exactly like this:
+Call your tool to fetch traces. Each trace entry includes: tool_name, has_error (boolean), and output summary.
+Analyze the traces and penalize any tool where has_error is true OR the output mentions 'error' or 'TOOL_ERROR'.
+If you find failing tools, output a JSON object exactly like this:
 ```json
 {
     "penalties": [
-        {"tool_name": "internal_kb", "reason": "Access denied error"}
+        {"tool_name": "internal_kb", "reason": "Tool returned error status"}
     ]
 }
 ```

@@ -121,25 +121,30 @@ def _run_threaded_query(q: str):
         
     return result
 
+def _run_background_evaluation():
+    """Runs LLM Jury in a daemon thread. Does NOT block the HTTP response."""
+    import time
+    time.sleep(2)  # Allow OTel exporter to flush spans first
+    try:
+        from tracepilot.evaluator import run_evaluations
+        run_evaluations()
+    except Exception as e:
+        print(f"[Background Eval Error]: {e}")
+
 @app.post("/api/query")
 def handle_query(request: QueryRequest, background_tasks: fastapi.BackgroundTasks):
     from concurrent.futures import ThreadPoolExecutor
-    from tracepilot.evaluator import run_evaluations
+    import threading
     try:
-        # Run in a separate thread to avoid Google ADK / httpx async conflicts without process overhead
         print(f"[DEBUG API] Received request.query: '{request.query}'")
+        # Step 1: Run the ADK agent query in a dedicated thread
         with ThreadPoolExecutor(max_workers=1) as executor:
             future = executor.submit(_run_threaded_query, request.query)
             result = future.result()
-            
-        # Run synchronously because Cloud Run freezes background threads immediately after HTTP response
-        import time
-        time.sleep(1) # Wait for OpenTelemetry flush
-        try:
-            print("\\n[dim]Triggering live LLM evaluation...[/dim]")
-            run_evaluations()
-        except Exception as e:
-            print(f"[red]Error in Live Eval: {e}[/red]")
+
+        # Step 2: Fire-and-forget the LLM Jury as a daemon thread — NEVER blocks response
+        eval_thread = threading.Thread(target=_run_background_evaluation, daemon=True)
+        eval_thread.start()
         
         print(f"[DEBUG API] Returning result: {str(result)[:200]}")
         return {"status": "success", "response": result}
@@ -272,10 +277,24 @@ def get_traces():
         clean_data = []
         for r in recent:
             attributes_str = r.get("attributes", "{}")
-            attributes = json.loads(attributes_str) if isinstance(attributes_str, str) else attributes_str
+            try:
+                attributes = json.loads(attributes_str) if isinstance(attributes_str, str) else (attributes_str or {})
+            except Exception:
+                attributes = {}
             
-            output_val = str(attributes.get("output", {}).get("value", ""))
-            status = "Error" if '"status": "error"' in output_val or "'status': 'error'" in output_val else "Success"
+            # output.value is a JSON string — parse it to check for errors
+            output_wrapper = attributes.get("output", {})
+            output_val_raw = output_wrapper.get("value", "") if isinstance(output_wrapper, dict) else str(output_wrapper)
+            try:
+                inner = json.loads(output_val_raw) if output_val_raw else {}
+                status = "Error" if inner.get("status") == "error" or "error" in inner.get("type", "").lower() else "Success"
+            except Exception:
+                # Fallback: string search
+                status = "Error" if '"status": "error"' in output_val_raw or "error" in output_val_raw.lower()[:60] else "Success"
+
+            # Check span-level error flag
+            if attributes.get("error", {}).get("type"):
+                status = "Error"
             
             tool_name = str(attributes.get("tool", {}).get("name", ""))
             if not tool_name:
