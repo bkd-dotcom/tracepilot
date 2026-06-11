@@ -143,7 +143,7 @@ def handle_query(request: QueryRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/evaluate_jury")
-async def evaluate_jury():
+def evaluate_jury():
     """Triggered by the frontend immediately after a query returns."""
     import time
     # Sleep to ensure Phoenix ingestion worker finishes writing to SQLite before we query it
