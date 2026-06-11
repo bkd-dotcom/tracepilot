@@ -17,7 +17,10 @@ async def async_run_evaluations():
     console.print("[dim]Fetching recent traces from Phoenix...[/dim]")
     
     from phoenix.client import Client
-    client = Client(endpoint=PHOENIX_ENDPOINT)
+    import os
+    os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = PHOENIX_ENDPOINT
+    os.environ.pop("PHOENIX_API_KEY", None)
+    client = Client()
     
     try:
         # Fetch the spans directly from Phoenix
