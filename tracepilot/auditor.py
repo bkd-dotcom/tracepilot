@@ -74,6 +74,9 @@ Output ONLY the JSON and nothing else.
                     if p.text:
                         result_text += p.text
     except Exception as e:
+        error_str = str(e)
+        if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+            raise Exception("API Rate Limit (429) reached on Gemini. Please wait a minute before running the Auditor again.")
         console.print(f"[red]Error running MCP Agent: {e}[/red]")
         raise e
 

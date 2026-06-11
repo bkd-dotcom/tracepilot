@@ -111,6 +111,16 @@ Output ONLY the JSON and nothing else.
                     if p.text:
                         result_text += p.text
     except Exception as e:
+        error_str = str(e)
+        if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+            console.print("[red]Jury Agent hit API Rate Limit (429)[/red]")
+            from tracepilot.events import emit_event
+            emit_event(
+                type="system",
+                title="LLM Jury: Rate Limited ⏳",
+                description="Gemini API quota exhausted (429). The Jury cannot evaluate this trace right now. Please wait a minute.",
+            )
+            return 0
         console.print(f"[red]Error running Jury Agent: {e}[/red]")
         raise e
 
