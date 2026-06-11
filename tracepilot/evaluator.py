@@ -16,41 +16,41 @@ async def async_run_evaluations():
     console.print("\n[bold cyan]═══ TracePilot LLM Jury ═══[/bold cyan]")
     console.print("[dim]Fetching recent traces from Phoenix...[/dim]")
     
-    from phoenix.client import Client
-    import os
-    os.environ.pop("PHOENIX_API_KEY", None)
-    # Connect explicitly to the local Phoenix server
-    client = Client()
-    
     try:
-        import pandas as pd
-        # Fetch spans to get the actual tool execution details and outputs
-        df = client.spans.get_spans_dataframe(project_name=PROJECT_NAME)
-        if df is None or df.empty:
+        import sqlite3
+        import os
+        import json
+        
+        db_path = os.path.expanduser("~/.phoenix/phoenix.db")
+        if not os.path.exists(db_path):
             console.print("[yellow]No traces found to evaluate.[/yellow]")
             return 0
             
-        if "attributes.tool.name" in df.columns:
-            tool_spans = df[df["attributes.tool.name"].notnull()]
-        else:
-            tool_spans = df[df.get("span_kind", "") == "TOOL"] if "span_kind" in df.columns else df
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT span_id, name, attributes 
+                FROM spans 
+                WHERE span_kind = 'TOOL' OR name LIKE 'execute_tool%'
+                ORDER BY start_time DESC 
+                LIMIT 1
+            """)
+            row = cursor.fetchone()
             
-        if "start_time" in tool_spans.columns:
-            tool_spans = tool_spans.sort_values(by="start_time")
-            
-        recent = tool_spans.tail(1).fillna("").to_dict(orient="records")
-        if not recent:
+        if not row:
             return 0
             
-        r = recent[0]
-        tool_name = str(r.get("attributes.tool.name", r.get("name", "Unknown"))).replace("execute_tool ", "")
-        output_val = str(r.get("attributes.output.value", ""))
-        hex_id = str(r.get("context.trace_id", ""))
+        hex_id = row[0]
+        tool_name = row[1]
+        attributes = json.loads(row[2]) if row[2] else {}
+        
+        actual_tool_name = attributes.get("tool.name", tool_name).replace("execute_tool ", "")
+        output_val = str(attributes.get("output.value", ""))
         
         # Prepare rich trace data for the LLM
         traces_to_eval = [{
             "trace_id": hex_id,
-            "name": tool_name,
+            "name": actual_tool_name,
             "output": output_val[:500]  # truncated to save tokens
         }]
     except Exception as e:

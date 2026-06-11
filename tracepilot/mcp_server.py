@@ -15,35 +15,39 @@ def get_recent_tool_executions(limit: int = 5) -> str:
     Analyze this output to find hidden 'Access Denied' or 'Error' failures.
     """
     try:
-        df = client.spans.get_spans_dataframe(project_name="tracepilot")
-        if df is None or df.empty:
+        import sqlite3
+        import os
+        import json
+        
+        db_path = os.path.expanduser("~/.phoenix/phoenix.db")
+        if not os.path.exists(db_path):
             return "[]"
             
-        if "attributes.tool.name" in df.columns:
-            tool_spans = df[df["attributes.tool.name"].notnull()]
-        else:
-            if "span_kind" in df.columns:
-                tool_spans = df[df["span_kind"] == "TOOL"]
-            else:
-                tool_spans = df
-                
-        # Sort chronologically to get the most recent ones at the tail
-        if "start_time" in tool_spans.columns:
-            tool_spans = tool_spans.sort_values(by="start_time")
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT name, attributes 
+                FROM spans 
+                WHERE span_kind = 'TOOL' OR name LIKE 'execute_tool%'
+                ORDER BY start_time DESC 
+                LIMIT ?
+            """, (limit,))
+            rows = cursor.fetchall()
             
-        recent = tool_spans.tail(limit).fillna("").to_dict(orient="records")
-        
         results = []
-        for r in recent:
-            tool_name = str(r.get("attributes.tool.name", r.get("name", "Unknown"))).replace("execute_tool ", "")
-            output_val = str(r.get("attributes.output.value", ""))
+        for row in rows:
+            name = row[0]
+            attributes = json.loads(row[1]) if row[1] else {}
+            
+            tool_name = attributes.get("tool.name", name).replace("execute_tool ", "")
+            output_val = str(attributes.get("output.value", ""))
             
             results.append({
                 "tool_name": tool_name,
                 "output": output_val[:200]  # truncate to prevent massive payload
             })
             
-        return json.dumps(results, indent=2)
+        return json.dumps(results)
     except Exception as e:
         return json.dumps({"error": str(e)})
 
