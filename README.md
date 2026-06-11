@@ -4,7 +4,7 @@
 
 ## 🚀 Live Demo
 
-**👉 [CLICK HERE for the Visual Step-by-Step Flowchart & Screenshots](EVALUATION_FLOW.md) 👈**
+**👉 [CLICK HERE for the Visual Step-by-Step Flowchart & Screenshots](PREVIEW.md) 👈**
 
 **Public API Endpoint:** `https://tracepilot-712918182816.us-central1.run.app`
 
