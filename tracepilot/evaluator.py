@@ -134,7 +134,8 @@ Output ONLY the JSON and nothing else.
         # Log Evaluations back to Arize Phoenix using direct SQLite to bypass UI crash bugs
         if eval_records:
             import sqlite3
-            db_path = '/Users/binaydalai/.phoenix/phoenix.db'
+            import os
+            db_path = os.path.expanduser("~/.phoenix/phoenix.db")
             try:
                 conn = sqlite3.connect(db_path)
                 cursor = conn.cursor()
