@@ -175,6 +175,11 @@ async def handle_audit(background_tasks: fastapi.BackgroundTasks = None):
         # Cloud Run freezes CPU after response, must evaluate synchronously
         try:
             console.print("[dim]Starting LLM Jury Evaluation...[/dim]")
+            
+            # Sleep 4 seconds to let Gemini API quota refill before launching the second agent
+            import asyncio
+            await asyncio.sleep(4.0)
+            
             await async_run_evaluations()
         except Exception as e:
             console.print(f"[red]Error in Jury Eval: {e}[/red]")
@@ -235,8 +240,11 @@ def get_documents():
 def test_mcp_local():
     import subprocess
     try:
-        result = subprocess.run(["python", "tracepilot/mcp_server.py", "--help"], capture_output=True, text=True, timeout=5)
+        # Run it for 2 seconds to see if it prints any stray logs to stdout
+        result = subprocess.run(["python", "tracepilot/mcp_server.py"], capture_output=True, text=True, timeout=2)
         return {"stdout": result.stdout, "stderr": result.stderr, "code": result.returncode}
+    except subprocess.TimeoutExpired as e:
+        return {"stdout": e.stdout, "stderr": e.stderr, "timeout": True}
     except Exception as e:
         return {"error": str(e)}
 

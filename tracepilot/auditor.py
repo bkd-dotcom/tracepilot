@@ -21,11 +21,12 @@ async def async_run_audit(db_path: str = "tracepilot_memory.db"):
     console.print("[dim]Spinning up Auditor Agent with Arize Phoenix MCP...[/dim]\n")
     
     from mcp.client.stdio import StdioServerParameters
+    import sys
     
     mcp_toolset = McpToolset(
         connection_params=StdioConnectionParams(
             server_params=StdioServerParameters(
-                command="python",
+                command=sys.executable,
                 args=[
                     "tracepilot/mcp_server.py"
                 ]
