@@ -49,9 +49,7 @@ RUN echo '#!/bin/bash\n\
 export CLOUD_RUN_PORT="${PORT:-7860}"\n\
 \n\
 # Start the local Open-Source Phoenix Server in the background\n\
-export PORT=6006\n\
-export HOST=0.0.0.0\n\
-python -m phoenix.server.main serve &\n\
+PHOENIX_PORT=6006 PHOENIX_HOST=0.0.0.0 python -m phoenix.server.main serve &\n\
 \n\
 # Wait for Phoenix to start\n\
 sleep 5\n\

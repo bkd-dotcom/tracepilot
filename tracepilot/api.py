@@ -246,18 +246,21 @@ def get_traces():
     from tracepilot.memory import get_last_reset_time
     import pandas as pd
     try:
-        from phoenix.client import Client
+        import sqlite3
         import os
+        import json
         
-        # Explicitly tell the Client to connect to the local containerized Phoenix server
-        os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "http://127.0.0.1:6006"
-        os.environ.pop("PHOENIX_API_KEY", None)
-        
-        import httpx
-        client = Client()
-        client._client.timeout = httpx.Timeout(30.0)
-        
-        df = client.spans.get_spans_dataframe(project_name=PROJECT_NAME)
+        db_path = os.path.expanduser("~/.phoenix/phoenix.db")
+        if not os.path.exists(db_path):
+            return {"status": "success", "data": []}
+            
+        with sqlite3.connect(db_path) as conn:
+            df = pd.read_sql_query("""
+                SELECT span_id, name, start_time, end_time, attributes, span_kind 
+                FROM spans 
+                WHERE span_kind = 'TOOL' OR name LIKE 'execute_tool%'
+            """, conn)
+            
         if df is None or df.empty:
             return {"status": "success", "data": []}
             
@@ -266,29 +269,28 @@ def get_traces():
         last_reset_dt = pd.to_datetime(last_reset, utc=True)
         df = df[df['start_time'] >= last_reset_dt]
         
-        if "attributes.tool.name" in df.columns:
-            tool_spans = df[df["attributes.tool.name"].notnull()]
-        else:
-            tool_spans = df[df.get("span_kind", "") == "TOOL"] if "span_kind" in df.columns else df
-            
-        recent = tool_spans.tail(15).fillna("").to_dict(orient="records")
+        df = df.sort_values(by="start_time")
+        recent = df.tail(15).fillna("").to_dict(orient="records")
         
         clean_data = []
         for r in recent:
-            output_val = str(r.get("attributes.output.value", ""))
+            attributes_str = r.get("attributes", "{}")
+            attributes = json.loads(attributes_str) if isinstance(attributes_str, str) else attributes_str
+            
+            output_val = str(attributes.get("output.value", ""))
             status = "Error" if '"status": "error"' in output_val or "'status': 'error'" in output_val else "Success"
             
-            tool_name = str(r.get("attributes.tool.name", ""))
+            tool_name = str(attributes.get("tool.name", ""))
             if not tool_name:
                 tool_name = str(r.get("name", "Unknown")).replace("execute_tool ", "")
-
             
             # Calculate latency from timestamps
             start_t = r.get("start_time")
             end_t = r.get("end_time")
             latency_sec = 0.0
             if pd.notnull(start_t) and pd.notnull(end_t):
-                latency_sec = (end_t - start_t).total_seconds()
+                end_dt = pd.to_datetime(end_t, utc=True)
+                latency_sec = (end_dt - start_t).total_seconds()
                 
             clean_data.append({
                 "name": tool_name,
